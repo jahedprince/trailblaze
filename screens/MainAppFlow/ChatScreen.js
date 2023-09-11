@@ -8,6 +8,7 @@ import {
   ScrollView,
   Image,
   TouchableOpacity,
+  Alert,
 } from "react-native";
 import axios from "axios"; // Import axios or use fetch
 import {
@@ -29,7 +30,7 @@ import createTravelItinerary from "../../api";
 import { initializeApp } from "firebase/app";
 import { getFirestore, collection, addDoc } from "firebase/firestore";
 import BottomNavigation from "../../components/BottomNavigation";
-import { red } from "react-native-reanimated";
+
 import {
   FIREBASE_API_KEY,
   FIREBASE_API_KEY2,
@@ -167,25 +168,41 @@ const ChatScreen = () => {
       // Dispatch to Redux (if needed)
       dispatch(updateItinerary(newItinerary));
 
-      // Save the newItinerary to Firestore
-      const firebaseConfig = {
-        apiKey: FIREBASE_API_KEY,
-        authDomain: FIREBASE_AUTH_DOMAIN,
-        projectId: FIREBASE_PROJECT_ID,
-        storageBucket: FIREBASE_STORAGE_BUCKET,
-        messagingSenderId: FIREBASE_MESSAGING_SENDER_ID,
-        appId: FIREBASE_APP_ID,
-      };
+      // Check if the user wants to save the itinerary in Firebase
+      Alert.alert(
+        "Save Itinerary",
+        "Do you want to save this itinerary to Firebase?",
+        [
+          {
+            text: "Cancel",
+            style: "cancel",
+          },
+          {
+            text: "Save",
+            onPress: async () => {
+              // Save the newItinerary to Firestore
+              const firebaseConfig = {
+                apiKey: FIREBASE_API_KEY,
+                authDomain: FIREBASE_AUTH_DOMAIN,
+                projectId: FIREBASE_PROJECT_ID,
+                storageBucket: FIREBASE_STORAGE_BUCKET,
+                messagingSenderId: FIREBASE_MESSAGING_SENDER_ID,
+                appId: FIREBASE_APP_ID,
+              };
 
-      const app = initializeApp(firebaseConfig);
-      const db = getFirestore(app);
+              const app = initializeApp(firebaseConfig);
+              const db = getFirestore(app);
 
-      const itinerariesCollection = collection(db, "itineraries");
+              const itinerariesCollection = collection(db, "itineraries");
 
-      await addDoc(itinerariesCollection, newItinerary);
+              await addDoc(itinerariesCollection, newItinerary);
 
-      // Navigate to HomeScreen with newItinerary data
-      navigation.navigate("Home", { newItinerary });
+              // Navigate to HomeScreen with newItinerary data
+              navigation.navigate("Home", { newItinerary });
+            },
+          },
+        ]
+      );
     } catch (error) {
       console.log(error);
     }
@@ -264,7 +281,7 @@ const ChatScreen = () => {
               paddingLeft: 10,
               marginRight: 10,
             }}
-            placeholder={"I want to travel to ___ for ___ days..."}
+            placeholder={"Travel to ___ for ___ days..."}
           />
         )}
         const
