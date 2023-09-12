@@ -34,12 +34,17 @@ import {
 import { useSelector } from "react-redux";
 import BottomNavigation from "../../components/BottomNavigation";
 import Swipeout from "react-native-swipeout";
+import { FontAwesome } from "@expo/vector-icons";
+import { Feather } from "@expo/vector-icons";
+import { Ionicons } from "@expo/vector-icons";
 
 const ItineraryDetailsScreen = ({ route }) => {
   const { itinerary } = route.params;
   const [editingActivity, setEditingActivity] = useState(null);
   const [itineraryData, setItineraryData] = useState(itinerary);
-
+  const [newActivityTexts, setNewActivityTexts] = useState(
+    Array(itineraryData.days.length).fill("")
+  ); // New state variable
   if (!itinerary) {
     return <Text>Loading...</Text>;
   }
@@ -101,6 +106,34 @@ const ItineraryDetailsScreen = ({ route }) => {
       });
     };
 
+    const addNewActivity = (dayIndex) => {
+      const newText = newActivityTexts[dayIndex]; // Get the text for the current day
+      if (newText.trim() !== "") {
+        const updatedItinerary = { ...itineraryData };
+        updatedItinerary.days[dayIndex].activities.push(newText);
+
+        // Update the local state to reflect the added activity
+        const updatedItineraryCopy = { ...itineraryData };
+        updatedItineraryCopy.days[dayIndex].activities =
+          updatedItinerary.days[dayIndex].activities;
+
+        setItineraryData(updatedItineraryCopy); // Update the state with the modified itinerary
+
+        const db = getFirestore();
+        const itineraryRef = doc(db, "itineraries", itinerary.id);
+
+        // Update Firestore with the updated activities array
+        updateDoc(itineraryRef, {
+          days: updatedItinerary.days,
+        });
+
+        // Clear the input field for the current day
+        const updatedTexts = [...newActivityTexts];
+        updatedTexts[dayIndex] = "";
+        setNewActivityTexts(updatedTexts);
+      }
+    };
+
     const activities = item.activities.map((activity, activityIndex) => {
       const isEditing =
         activityIndex === editingActivity?.activityIndex &&
@@ -119,13 +152,43 @@ const ItineraryDetailsScreen = ({ route }) => {
         <Swipeout
           right={[
             {
-              text: "Edit",
-              backgroundColor: "#357FEE",
+              component: (
+                <View
+                  style={{
+                    backgroundColor: "#357FEE",
+                    borderRadius: 15, // Set the borderRadius here
+                    flex: 0.95,
+                    justifyContent: "center",
+                    alignItems: "center",
+
+                    marginBottom: 1,
+                  }}
+                  // onPress={startEditing}
+                >
+                  <Feather name="edit" size={28} color="white" />
+                </View>
+              ),
+              backgroundColor: "transparent",
               onPress: () => onEdit(activityIndex),
             },
             {
-              text: "Delete",
-              backgroundColor: "#E92B2B",
+              component: (
+                <View
+                  style={{
+                    backgroundColor: "#E92B2B",
+                    borderRadius: 15, // Set the borderRadius here
+                    flex: 0.95,
+                    justifyContent: "center",
+                    alignItems: "center",
+                    marginBottom: 0,
+                  }}
+                  // onPress={() => onDelete(item.id)}
+                >
+                  <FontAwesome name="trash" size={28} color="white" />
+                </View>
+              ),
+              backgroundColor: "transparent",
+
               onPress: () => onDelete(activityIndex), // Call the onDelete function here
             },
           ]}
@@ -182,6 +245,28 @@ const ItineraryDetailsScreen = ({ route }) => {
             <Text style={styles.header}>{`Day ${item.dayNumber}`}</Text>
           </View>
           {activities}
+
+          <TextInput
+            style={styles.newActivityInput}
+            placeholder="Add a new activity"
+            value={newActivityTexts[index]} // Use the newActivityText for the current day
+            onChangeText={(text) => {
+              const updatedTexts = [...newActivityTexts];
+              updatedTexts[index] = text;
+              setNewActivityTexts(updatedTexts);
+            }}
+          />
+          <TouchableOpacity
+            style={styles.addButton} // Define this style in your stylesheet
+            onPress={() => addNewActivity(index)}
+          >
+            {/* <Text style={styles.buttonText}>Add Activity</Text> */}
+            <Ionicons
+              name="ios-add-circle-outline"
+              size={30}
+              color="rgba(34, 221, 133, 0.8)"
+            />
+          </TouchableOpacity>
         </LinearGradient>
       </View>
     );
@@ -222,6 +307,32 @@ const ItineraryDetailsScreen = ({ route }) => {
 };
 
 const styles = StyleSheet.create({
+  addButton: {
+    backgroundColor: "transparent", // Change to your desired background color
+    padding: 10,
+    borderRadius: 5,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  buttonText: {
+    color: "rgba(25, 130, 252, 0.8)", // Change to your desired text color
+    fontSize: 19, // Adjust the font size as needed
+
+    letterSpacing: 0.25,
+    lineHeight: 20,
+  },
+  newActivityInput: {
+    fontFamily: "Overpass-SemiBold",
+    fontSize: 20,
+    color: "white",
+    textAlign: "center",
+    marginBottom: 0,
+    backgroundColor: "rgba(0, 0, 0, 0.3)",
+    borderRadius: 20,
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    marginTop: 20,
+  },
   activityContainer: {
     marginBottom: 5,
   },
