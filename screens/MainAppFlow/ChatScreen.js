@@ -145,14 +145,16 @@ const ChatScreen = () => {
       );
 
       // Process the itinerary text to extract day-by-day details
-      const daysPattern = /Day\s+(\d+):\s+(.*)/g;
+      // Process the itinerary text to extract day-by-day details
+      const daysPattern = /Day\s+(\d+):\s+(.*?)(?=(?:Day\s+\d+|$))/gs;
       let dayMatches;
       const dayDetails = [];
 
       while ((dayMatches = daysPattern.exec(itinerary)) !== null) {
         const dayNumber = parseInt(dayMatches[1]);
         const activities = dayMatches[2]
-          .split("\n")
+          .split(/\n/)
+          .filter((activity) => activity.trim() !== "")
           .map((activity) => activity.trim());
         dayDetails.push({ dayNumber, activities });
       }

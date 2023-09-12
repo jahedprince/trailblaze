@@ -48,10 +48,12 @@ const ItineraryDetailsScreen = ({ route }) => {
           <View style={styles.iconAndHeader}>
             <Text style={styles.header}>{`Day ${item.dayNumber}`}</Text>
           </View>
-          {activities.map((activity, activityIndex) => (
-            <Text style={styles.itineraryDetails} key={activityIndex}>
-              {activity}
-            </Text>
+          {item.activities.map((activity, activityIndex) => (
+            <Text style={styles.itineraryDetails} key={activityIndex}>{`${
+              activity.startsWith("-") ? activity.slice(1).trim() : activity
+            }${
+              activityIndex !== item.activities.length - 1 ? "\n" : ""
+            }`}</Text>
           ))}
         </LinearGradient>
       </TouchableOpacity>
@@ -187,11 +189,11 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
   },
-  iconAndHeader: {
-    flexDirection: "row", // Arrange items horizontally
-    alignItems: "center", // Align items vertically in the center
-    marginBottom: 10, // Add margin as needed
-  },
+  // iconAndHeader: {
+  //   flexDirection: "row", // Arrange items horizontally
+  //   alignItems: "center", // Align items vertically in the center
+  //   marginBottom: 10, // Add margin as needed
+  // },
   itineraryItem: {
     marginBottom: 15,
     borderRadius: 30,
@@ -212,7 +214,10 @@ const styles = StyleSheet.create({
     paddingBottom: 0,
     paddingLeft: 0,
     paddingRight: 10,
+    marginBottom: 10,
     color: "rgba(34, 221, 133, 1)",
+    textAlign: "center",
+    justifyContent: "center",
   },
   viewDetails: {
     fontSize: 20,
@@ -224,8 +229,9 @@ const styles = StyleSheet.create({
   },
   itineraryDetails: {
     fontFamily: "Overpass-SemiBold",
-    fontSize: 20,
+    fontSize: 21,
     color: "white",
+    textAlign: "center", // Add this line to center-align the text
   },
 });
 
