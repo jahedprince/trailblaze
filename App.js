@@ -2,6 +2,7 @@ import { getApps, initializeApp } from "firebase/app";
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { getFirestore } from "firebase/firestore";
 import React from "react";
+import { getAuth } from "firebase/auth";
 
 // import * as React from "react";
 
@@ -18,8 +19,11 @@ import HomeScreen from "./screens/MainAppFlow/HomeScreen";
 import ItineraryDetailsScreen from "./screens/MainAppFlow/ItineraryDetailsScreen";
 import ChatScreen from "./screens/MainAppFlow/ChatScreen";
 import IPhone14Pro6 from "./screens/IPhone14Pro6";
+import MyProfile from "./screens/MyProfile";
 import BottomNavigation from "./components/BottomNavigation";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import SignIn from "./screens/SignIn";
+import SignUp from "./screens/SignUp";
 import {
   FIREBASE_API_KEY,
   FIREBASE_AUTH_DOMAIN,
@@ -39,6 +43,8 @@ const firebaseConfig = {
 };
 
 const app = initializeApp(firebaseConfig);
+
+const auth = getAuth(app);
 
 const db = getFirestore(app);
 
@@ -92,6 +98,21 @@ const App = () => {
               component={ChatScreen}
               options={{ headerShown: false }}
             />
+            <Stack.Screen
+              name="Profile"
+              component={MyProfile}
+              options={{ headerShown: false }}
+            />
+            <Stack.Screen
+              name="signin"
+              component={SignIn}
+              options={{ headerShown: false }}
+            />
+            <Stack.Screen
+              name="signup"
+              component={SignUp}
+              options={{ headerShown: false }}
+            />
           </Stack.Navigator>
         ) : (
           <Stack.Navigator>
@@ -102,6 +123,17 @@ const App = () => {
               component={ItineraryDetailsScreen}
             />
             <Stack.Screen name="Chat" component={ChatScreen} />
+            <Stack.Screen name="Profile" component={MyProfile} />
+            <Stack.Screen
+              name="signin"
+              component={SignIn}
+              options={{ headerShown: false }}
+            />
+            <Stack.Screen
+              name="signup"
+              component={SignUp}
+              options={{ headerShown: false }}
+            />
           </Stack.Navigator>
         )}
       </NavigationContainer>
@@ -110,3 +142,5 @@ const App = () => {
 };
 
 export default App;
+
+export { auth };

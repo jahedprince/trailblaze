@@ -18,7 +18,7 @@ const IPhone14Pro = () => {
   const navigation = useNavigation();
 
   const handleStartClick = () => {
-    navigation.navigate("Home");
+    navigation.navigate("signin");
   };
   return (
     <ImageBackground
