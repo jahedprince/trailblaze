@@ -17,6 +17,7 @@ import {
 } from "firebase/auth";
 import { collection, query, where, getDocs } from "firebase/firestore";
 import { getFirestore } from "firebase/firestore";
+import { useUser } from "../Providers/UserContext";
 
 import {
   FIREBASE_API_KEY,
@@ -62,11 +63,35 @@ const fetchUserDataFromFirestore = async (userUid) => {
   }
 };
 
+const fetchUserItinerariesFromFirestore = async (userUid) => {
+  try {
+    const itinerariesRef = collection(db, "itineraries"); // Replace "itineraries" with your Firestore collection name for itineraries
+    const itinerariesQuery = query(
+      itinerariesRef,
+      where("userUid", "==", userUid)
+    );
+    const itinerariesSnapshot = await getDocs(itinerariesQuery);
+
+    const userItineraries = [];
+
+    itinerariesSnapshot.forEach((doc) => {
+      const itineraryData = doc.data();
+      userItineraries.push(itineraryData);
+    });
+
+    return userItineraries;
+  } catch (error) {
+    throw error;
+  }
+};
+
 const LoginComponent = () => {
   const navigation = useNavigation();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState(null);
+  const [userUid, setUserUid] = useState(null); // New state variable to store the user's UID
+  const { setUserData } = useUser();
 
   const handleClick = () => {
     navigation.navigate("signup");
@@ -82,31 +107,44 @@ const LoginComponent = () => {
       const user = userCredential.user;
       console.log("User signed in:", user);
 
+      // Set the user's UID
+      setUserUid(user.uid);
+
       // Fetch user-specific data from Firestore
       const userData = await fetchUserDataFromFirestore(user.uid);
 
-      // Redirect to the homepage and pass user data as navigation parameters
-      navigation.navigate("Home", { userData });
+      // Fetch user-specific itineraries
+      const userItineraries = await fetchUserItinerariesFromFirestore(user.uid);
+
+      setUserData(userData);
+
+      // Redirect to the homepage and pass user data and itineraries as navigation parameters
+      navigation.navigate("Home", { userData, userItineraries, userUid }); // Pass userUid as a parameter
     } catch (error) {
-      const errorCode = error.code;
-      let errorMessage = "An error occurred. Please try again.";
+      if (email === "" || password === "") {
+        setError("All fields must be entered");
+      } else {
+        const errorCode = error.code;
+        let errorMessage = "An error occurred. Please try again.";
 
-      // Customize the error message based on the error code
-      switch (errorCode) {
-        case AuthErrorCodes.INVALID_EMAIL:
-        case AuthErrorCodes.INVALID_PASSWORD:
-          errorMessage = "Email and/or password may be wrong.";
-          break;
+        // Customize the error message based on the error code
+        switch (errorCode) {
+          case AuthErrorCodes.INVALID_EMAIL:
+          case AuthErrorCodes.INVALID_PASSWORD:
+            errorMessage = "Email and/or password may be wrong.";
+            break;
 
-        // Add more cases as needed
+          // Add more cases as needed
 
-        default:
-          // Use the default error message
-          break;
+          default:
+            // Use the default error message
+            break;
+        }
+
+        setError(errorMessage);
       }
 
-      setError(errorMessage);
-      console.error("Authentication error:", error);
+      //   console.error("Authentication error:", error);
     }
   };
 

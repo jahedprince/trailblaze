@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Modal,
   StyleSheet,
@@ -12,6 +12,16 @@ import { MaterialIcons } from "@expo/vector-icons";
 import { FontAwesome } from "@expo/vector-icons";
 import { Ionicons } from "@expo/vector-icons";
 import { Entypo } from "@expo/vector-icons";
+import { getAuth, updateEmail, updatePassword, signOut } from "firebase/auth";
+import {
+  getFirestore,
+  doc,
+  updateDoc,
+  collection,
+  query,
+  where,
+  getDocs,
+} from "firebase/firestore";
 
 import BottomNavigation from "../components/BottomNavigation";
 import { useNavigation } from "@react-navigation/native";
@@ -26,9 +36,58 @@ const MyProfile = () => {
   const [isEmailModalVisible, setEmailModalVisible] = useState(false);
   const [isPasswordModalVisible, setPasswordModalVisible] = useState(false);
 
-  const [name, setName] = useState("Jahed Prince"); // Initialize with your default values
-  const [email, setEmail] = useState("jahed@example.com");
-  const [password, setPassword] = useState("********"); // You may want to handle passwords more securely
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
+  const auth = getAuth();
+  const db = getFirestore();
+
+  const fetchUserData = async () => {
+    try {
+      const user = auth.currentUser;
+
+      // Query the Firestore collection "users" based on the "email" field
+      const q = query(
+        collection(db, "users"),
+        where("email", "==", user.email)
+      );
+      const querySnapshot = await getDocs(q);
+
+      if (querySnapshot.size === 1) {
+        const userDoc = querySnapshot.docs[0];
+        const userData = userDoc.data();
+        setName(userData.name || "");
+        setEmail(userData.email || "");
+      }
+    } catch (error) {
+      console.error("Error fetching user data:", error);
+    }
+  };
+
+  const updateUserEmail = async (newEmail) => {
+    try {
+      const user = auth.currentUser;
+
+      // Update the email in Firebase Authentication
+      await updateEmail(user, newEmail);
+
+      // Update the email in Firestore
+      const userDocRef = doc(db, "users", user.uid);
+      await updateDoc(userDocRef, {
+        email: newEmail,
+      });
+
+      // Set the new email in the component state
+      setEmail(newEmail);
+
+      // Close the email modal
+      toggleEmailModal();
+    } catch (error) {
+      console.error("Error updating email:", error);
+      // Handle errors, e.g., show an error message to the user
+    }
+  };
 
   const toggleNameModal = () => {
     setNameModalVisible(!isNameModalVisible);
@@ -43,21 +102,29 @@ const MyProfile = () => {
   };
 
   const handleNameChange = (newName) => {
-    // Handle the name change here
     setName(newName);
-    toggleNameModal(); // Close the modal after saving
+    toggleNameModal();
   };
 
-  const handleEmailChange = (newEmail) => {
-    // Handle the email change here
-    setEmail(newEmail);
-    toggleEmailModal(); // Close the modal after saving
+  const updateUserPassword = async (newPassword) => {
+    try {
+      const user = auth.currentUser;
+
+      await updatePassword(user, newPassword);
+
+      togglePasswordModal();
+    } catch (error) {
+      console.error("Error updating password:", error);
+    }
   };
 
-  const handlePasswordChange = (newPassword) => {
-    // Handle the password change here
-    setPassword(newPassword);
-    togglePasswordModal(); // Close the modal after saving
+  const handleLogout = async () => {
+    try {
+      await signOut(auth);
+      navigation.navigate("signin"); // Redirect to the sign-in screen or any other screen as needed
+    } catch (error) {
+      console.error("Error signing out:", error);
+    }
   };
 
   return (
@@ -155,7 +222,7 @@ const MyProfile = () => {
                   onChangeText={(text) => setEmail(text)}
                   placeholder="Enter new email"
                 />
-                <TouchableOpacity onPress={() => handleEmailChange(email)}>
+                <TouchableOpacity onPress={() => updateUserEmail(email)}>
                   <Text style={styles.saveButton}>Save</Text>
                 </TouchableOpacity>
                 <TouchableOpacity onPress={toggleEmailModal}>
@@ -194,9 +261,7 @@ const MyProfile = () => {
                   placeholder="Enter new password"
                   secureTextEntry={true} // This hides the entered password
                 />
-                <TouchableOpacity
-                  onPress={() => handlePasswordChange(password)}
-                >
+                <TouchableOpacity onPress={() => updateUserPassword(password)}>
                   <Text style={styles.saveButton}>Save</Text>
                 </TouchableOpacity>
                 <TouchableOpacity onPress={togglePasswordModal}>
@@ -205,7 +270,7 @@ const MyProfile = () => {
               </View>
             </View>
           </Modal>
-          <TouchableOpacity onPress={handleClick}>
+          <TouchableOpacity onPress={handleLogout}>
             <View style={[styles.airportCrad4, styles.airportLayout]}>
               <View
                 style={[styles.airportCradChild4, styles.frameViewPosition]}

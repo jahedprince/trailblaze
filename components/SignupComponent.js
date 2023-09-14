@@ -14,7 +14,7 @@ import {
   createUserWithEmailAndPassword,
   AuthErrorCodes,
 } from "firebase/auth";
-import { collection, addDoc } from "firebase/firestore";
+import { collection, addDoc, setDoc, doc } from "firebase/firestore";
 import { getFirestore } from "firebase/firestore";
 
 import {
@@ -63,10 +63,14 @@ const SignupComponent = () => {
       const user = userCredential.user;
       console.log("User signed up:", user);
 
-      // Create a Firestore document for the user
-      await addDoc(collection(db, "users"), {
-        uid: user.uid,
+      // Create a Firestore document for the user with UID as document ID
+      const userDocRef = doc(db, "users", user.uid);
+
+      // Set the document data
+      await setDoc(userDocRef, {
         email,
+        uid: user.uid,
+
         // Add other user data here
       });
 

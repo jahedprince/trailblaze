@@ -40,16 +40,20 @@ import {
   FIREBASE_MESSAGING_SENDER_ID,
   FIREBASE_APP_ID,
 } from "@env";
+import { getAuth } from "firebase/auth";
+import { useUser } from "../../Providers/UserContext";
 
 /* eslint-disable prettier/prettier */
 
 const ChatScreen = () => {
   const navigation = useNavigation();
   const [messages, setMessages] = useState([]);
+  const { userData } = useUser();
 
   const apiKey = FIREBASE_API_KEY2;
 
   const dispatch = useDispatch();
+  const auth = getAuth();
 
   const handleSend = async (newMessages = []) => {
     try {
@@ -182,7 +186,7 @@ const ChatScreen = () => {
           {
             text: "Save",
             onPress: async () => {
-              // Save the newItinerary to Firestore
+              // Save the newItinerary to Firestore with UID
               const firebaseConfig = {
                 apiKey: FIREBASE_API_KEY,
                 authDomain: FIREBASE_AUTH_DOMAIN,
@@ -197,7 +201,14 @@ const ChatScreen = () => {
 
               const itinerariesCollection = collection(db, "itineraries");
 
-              await addDoc(itinerariesCollection, newItinerary);
+              // Get the UID of the signed-in user
+              const user = auth.currentUser;
+              const uid = user ? user.uid : null;
+
+              // Add UID to the newItinerary object
+              const newItineraryWithUID = { ...newItinerary, uid };
+
+              await addDoc(itinerariesCollection, newItineraryWithUID);
 
               // Navigate to HomeScreen with newItinerary data
               navigation.navigate("Home", { newItinerary });

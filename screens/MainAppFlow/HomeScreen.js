@@ -29,8 +29,9 @@ import {
   onSnapshot,
   doc,
   setDoc,
-  deleteDoc, // Import the deleteDoc function
+  deleteDoc,
 } from "firebase/firestore";
+import { useUser } from "../../Providers/UserContext"; // Update the import path to match your project structure
 
 const HomeScreen = () => {
   const navigation = useNavigation();
@@ -41,6 +42,8 @@ const HomeScreen = () => {
   }-${currentDate.getDate()}`;
 
   const [itineraries, setItineraries] = useState([]);
+  // const userData = route.params?.userData; // Get user data passed from Login screen
+  const { userData } = useUser(); // Get the userData from the context
 
   useEffect(() => {
     const firebaseConfig = {
@@ -54,21 +57,21 @@ const HomeScreen = () => {
 
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
+    // const { uid } = route.params;
 
     const itinerariesCollection = collection(db, "itineraries");
 
     const unsubscribe = onSnapshot(itinerariesCollection, (querySnapshot) => {
-      const updatedItineraries = querySnapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      }));
-      setItineraries(updatedItineraries);
+      const userItineraries = querySnapshot.docs
+        .map((doc) => ({ id: doc.id, ...doc.data() }))
+        .filter((itinerary) => itinerary.uid === userData.uid); // Filter itineraries by user's uid
+      setItineraries(userItineraries);
     });
 
     return () => {
       unsubscribe();
     };
-  }, []);
+  }, [userData]);
 
   // Define the deleteItinerary function
   const deleteItinerary = async (itineraryId) => {
@@ -110,7 +113,6 @@ const HomeScreen = () => {
       console.error("Error editing itinerary:", error);
     }
   };
-
   const renderItineraryItem = ({ item }) => (
     <ItineraryItem
       item={item}
@@ -118,7 +120,7 @@ const HomeScreen = () => {
         navigation.navigate("ItineraryDetails", { itinerary: item })
       }
       onDelete={() => deleteItinerary(item.id)}
-      onEdit={(newDestination) => editItinerary(item.id, newDestination)} // Pass the editItinerary function
+      onEdit={(newDestination) => editItinerary(item.id, newDestination)}
     />
   );
 

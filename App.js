@@ -22,6 +22,7 @@ import IPhone14Pro6 from "./screens/IPhone14Pro6";
 import MyProfile from "./screens/MyProfile";
 import BottomNavigation from "./components/BottomNavigation";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import { UserProvider } from "./Providers/UserContext";
 import SignIn from "./screens/SignIn";
 import SignUp from "./screens/SignUp";
 import {
@@ -74,69 +75,71 @@ const App = () => {
 
   return (
     <Provider store={store}>
-      <NavigationContainer>
-        {hideSplashScreen ? (
-          <Stack.Navigator>
-            <Stack.Screen
-              name="IPhone14Pro6"
-              component={IPhone14Pro6}
-              options={{ headerShown: false }}
-            />
-            <Stack.Screen
-              name="Home"
-              component={HomeScreen}
-              options={{ headerShown: false }}
-            />
+      <UserProvider>
+        <NavigationContainer>
+          {hideSplashScreen ? (
+            <Stack.Navigator>
+              <Stack.Screen
+                name="IPhone14Pro6"
+                component={IPhone14Pro6}
+                options={{ headerShown: false }}
+              />
+              <Stack.Screen
+                name="Home"
+                component={HomeScreen}
+                options={{ headerShown: false }}
+              />
 
-            <Stack.Screen
-              name="ItineraryDetails"
-              component={ItineraryDetailsScreen}
-              options={{ headerShown: false }}
-            />
-            <Stack.Screen
-              name="Chat"
-              component={ChatScreen}
-              options={{ headerShown: false }}
-            />
-            <Stack.Screen
-              name="Profile"
-              component={MyProfile}
-              options={{ headerShown: false }}
-            />
-            <Stack.Screen
-              name="signin"
-              component={SignIn}
-              options={{ headerShown: false }}
-            />
-            <Stack.Screen
-              name="signup"
-              component={SignUp}
-              options={{ headerShown: false }}
-            />
-          </Stack.Navigator>
-        ) : (
-          <Stack.Navigator>
-            <Stack.Screen name="Home" component={HomeScreen} />
+              <Stack.Screen
+                name="ItineraryDetails"
+                component={ItineraryDetailsScreen}
+                options={{ headerShown: false }}
+              />
+              <Stack.Screen
+                name="Chat"
+                component={ChatScreen}
+                options={{ headerShown: false }}
+              />
+              <Stack.Screen
+                name="Profile"
+                component={MyProfile}
+                options={{ headerShown: false }}
+              />
+              <Stack.Screen
+                name="signin"
+                component={SignIn}
+                options={{ headerShown: false }}
+              />
+              <Stack.Screen
+                name="signup"
+                component={SignUp}
+                options={{ headerShown: false }}
+              />
+            </Stack.Navigator>
+          ) : (
+            <Stack.Navigator>
+              <Stack.Screen name="Home" component={HomeScreen} />
 
-            <Stack.Screen
-              name="ItineraryDetails"
-              component={ItineraryDetailsScreen}
-            />
-            <Stack.Screen name="Chat" component={ChatScreen} />
-            <Stack.Screen name="Profile" component={MyProfile} />
-            <Stack.Screen
-              name="signin"
-              component={SignIn}
-              options={{ headerShown: false }}
-            />
-            <Stack.Screen
-              name="signup"
-              component={SignUp}
-              options={{ headerShown: false }}
-            />
-          </Stack.Navigator>
-        )}
-      </NavigationContainer>
+              <Stack.Screen
+                name="ItineraryDetails"
+                component={ItineraryDetailsScreen}
+              />
+              <Stack.Screen name="Chat" component={ChatScreen} />
+              <Stack.Screen name="Profile" component={MyProfile} />
+              <Stack.Screen
+                name="signin"
+                component={SignIn}
+                options={{ headerShown: false }}
+              />
+              <Stack.Screen
+                name="signup"
+                component={SignUp}
+                options={{ headerShown: false }}
+              />
+            </Stack.Navigator>
+          )}
+        </NavigationContainer>
+      </UserProvider>
     </Provider>
   );
 };
