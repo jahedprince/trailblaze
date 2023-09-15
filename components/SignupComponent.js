@@ -51,6 +51,7 @@ const SignupComponent = () => {
   const [password, setPassword] = useState("");
   const [name, setName] = useState(""); // Add state for the user's name
   const [error, setError] = useState(null);
+  const [profilePictureUrl, setProfilePictureUrl] = useState(null);
 
   const handleClick = () => {
     navigation.navigate("signin");
@@ -98,6 +99,7 @@ const SignupComponent = () => {
         uid: user.uid,
         name, // Include the user's name
         // Add other user data here
+        profilePictureUrl,
       });
       // Redirect to the login page or any desired screen
       navigation.navigate("signin");
