@@ -278,7 +278,7 @@ const styles = StyleSheet.create({
     color: "#848484",
     marginLeft: 10,
     fontSize: 20,
-    width: 295,
+    width: 240,
   },
   signupButtonContainer: {
     backgroundColor: "#00a3ff",

@@ -16,6 +16,7 @@ import {
   getAuth,
   signInWithEmailAndPassword,
   AuthErrorCodes,
+  sendPasswordResetEmail,
 } from "firebase/auth";
 import { collection, query, where, getDocs } from "firebase/firestore";
 import { getFirestore } from "firebase/firestore";
@@ -122,6 +123,8 @@ const LoginComponent = () => {
 
       // Redirect to the homepage and pass user data and itineraries as navigation parameters
       navigation.navigate("Home", { userData, userItineraries, userUid }); // Pass userUid as a parameter
+
+      setError(null);
     } catch (error) {
       if (email === "" || password === "") {
         setError("All fields must be entered.");
@@ -146,6 +149,23 @@ const LoginComponent = () => {
       }
 
       //   console.error("Authentication error:", error);
+    }
+  };
+
+  const handleForgotPassword = async () => {
+    try {
+      if (email === "") {
+        setError("Please enter your email address.");
+        return;
+      }
+
+      await sendPasswordResetEmail(auth, email);
+
+      // Password reset email sent successfully
+      setError("Password reset email sent. Check your inbox.");
+    } catch (error) {
+      setError("An error occurred. Please try again.");
+      console.error("Password reset error:", error);
     }
   };
 
@@ -204,6 +224,9 @@ const LoginComponent = () => {
         >
           <Text style={styles.loginButton}>Login</Text>
         </TouchableOpacity>
+        <Text style={styles.forgotPassword} onPress={handleForgotPassword}>
+          Forgot Password?
+        </Text>
         {error && <Text style={styles.errorMessage}>{error}</Text>}
       </View>
     </TouchableWithoutFeedback>
@@ -219,14 +242,14 @@ const styles = StyleSheet.create({
     borderRadius: 24,
     paddingBottom: 10,
     width: 320,
-    height: 330,
+    height: 370,
   },
   backgroundOverlay: {
     position: "absolute",
     backgroundColor: "rgba(7, 54, 63, 0.8)",
     borderRadius: 24,
     width: 370,
-    height: 390,
+    height: 430,
   },
   loginTitle: {
     fontFamily: "Poppins-Bold",
@@ -275,7 +298,7 @@ const styles = StyleSheet.create({
     color: "#848484",
     marginLeft: 10,
     fontSize: 18,
-    width: 295,
+    width: 245,
   },
   inputLabel1: {
     fontFamily: "Poppins-Medium",
@@ -313,6 +336,7 @@ const styles = StyleSheet.create({
     marginTop: 10,
     fontSize: 15,
     textDecorationLine: "underline",
+    textAlign: "center",
   },
 });
 
