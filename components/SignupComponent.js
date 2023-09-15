@@ -5,6 +5,8 @@ import {
   Text,
   TouchableOpacity,
   TextInput,
+  TouchableWithoutFeedback,
+  Keyboard,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import firebase from "firebase/app";
@@ -16,6 +18,9 @@ import {
 } from "firebase/auth";
 import { collection, addDoc, setDoc, doc } from "firebase/firestore";
 import { getFirestore } from "firebase/firestore";
+import { FontAwesome } from "@expo/vector-icons";
+import { FontAwesome5 } from "@expo/vector-icons";
+import { Ionicons } from "@expo/vector-icons";
 
 import {
   FIREBASE_API_KEY,
@@ -37,24 +42,46 @@ const firebaseConfig = {
 
 // Initialize Firebase app
 const app = initializeApp(firebaseConfig);
-
-// Initialize Firebase Authentication
 const auth = getAuth(app);
-
 const db = getFirestore(app);
 
 const SignupComponent = () => {
   const navigation = useNavigation();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [name, setName] = useState(""); // Add state for the user's name
   const [error, setError] = useState(null);
 
   const handleClick = () => {
     navigation.navigate("signin");
   };
 
+  const isPasswordValid = (password) => {
+    // Implement your custom password requirements here
+    // Example: Password should be at least 8 characters and include at least one digit
+    const minLength = 6;
+    const hasDigit = /\d/.test(password);
+
+    return password.length >= minLength && hasDigit;
+  };
+
   const handleSignUp = async () => {
     try {
+      Keyboard.dismiss();
+
+      // Check for empty fields
+      if (email === "" || password === "" || name === "") {
+        setError("All fields must be entered.");
+        return;
+      }
+
+      if (!isPasswordValid(password)) {
+        setError(
+          "Password should be at least 6 characters and include at least one digit."
+        );
+        return;
+      }
+
       const userCredential = await createUserWithEmailAndPassword(
         auth,
         email,
@@ -65,32 +92,37 @@ const SignupComponent = () => {
 
       // Create a Firestore document for the user with UID as document ID
       const userDocRef = doc(db, "users", user.uid);
-
-      // Set the document data
+      // Set the document data, including the user's name
       await setDoc(userDocRef, {
         email,
         uid: user.uid,
-
+        name, // Include the user's name
         // Add other user data here
       });
-
       // Redirect to the login page or any desired screen
       navigation.navigate("signin");
     } catch (error) {
       const errorCode = error.code;
+      console.error("Firebase Error Code:", errorCode); // Print the error code to the console
+
       let errorMessage = "An error occurred. Please try again.";
 
-      // Customize the error message based on the error code
+      // Customized error message
       switch (errorCode) {
-        case AuthErrorCodes.EMAIL_ALREADY_IN_USE:
+        case "auth/email-already-in-use":
           errorMessage = "Email is already in use. Please choose another.";
           break;
-
-        // Add more cases as needed
-
+        case "auth/weak-password":
+          errorMessage = "Password should be at least 6 characters.";
+          break;
         default:
           // Use the default error message
           break;
+      }
+
+      // Now check for empty fields
+      if (email === "" || password === "" || name === "") {
+        errorMessage = "All fields must be entered.";
       }
 
       setError(errorMessage);
@@ -99,47 +131,84 @@ const SignupComponent = () => {
   };
 
   return (
-    <View style={styles.container}>
-      <View style={styles.backgroundOverlay} />
-      <Text style={styles.loginTitle}>Sign Up</Text>
-      <View style={styles.haveAccountContainer}>
-        <Text style={styles.haveAccountText}>Already have an account?</Text>
-        <TouchableOpacity onPress={() => navigation.navigate("Login")}>
-          <Text style={styles.loginLink} onPress={handleClick}>
-            Login
-          </Text>
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+      <View style={styles.container}>
+        <View style={styles.backgroundOverlay} />
+        <Text style={styles.loginTitle}>Sign Up</Text>
+        <View style={styles.haveAccountContainer}>
+          <Text style={styles.haveAccountText}>Already have an account?</Text>
+          <TouchableOpacity onPress={() => navigation.navigate("Login")}>
+            <Text style={styles.loginLink} onPress={handleClick}>
+              Login
+            </Text>
+          </TouchableOpacity>
+        </View>
+        <View style={styles.inputContainer}>
+          <View style={styles.inputIcon}>
+            <FontAwesome
+              style={styles.userIcon}
+              name="user-circle"
+              size={23}
+              color="#6C6C6C"
+            />
+            <TextInput
+              style={styles.inputLabel}
+              placeholder="Name"
+              value={name}
+              onChangeText={(text) => setName(text)}
+              blurOnSubmit={true}
+              placeholderTextColor="#4C4C4C"
+            />
+          </View>
+        </View>
+        <View style={styles.inputContainer}>
+          <View style={styles.inputIcon}>
+            <Ionicons
+              name="mail"
+              style={styles.userIcon}
+              size={24}
+              color="#6C6C6C"
+            />
+
+            <TextInput
+              style={styles.inputLabel}
+              placeholder="Email"
+              value={email}
+              onChangeText={(text) => setEmail(text)}
+              blurOnSubmit={true}
+              placeholderTextColor="#4C4C4C"
+            />
+          </View>
+        </View>
+        <View style={styles.inputContainer}>
+          <View style={styles.inputIcon}>
+            <FontAwesome5
+              style={styles.userIcon}
+              name="key"
+              size={23}
+              color="#6C6C6C"
+            />
+            <TextInput
+              style={styles.inputLabel}
+              placeholder="Password"
+              secureTextEntry
+              value={password}
+              onChangeText={(text) => setPassword(text)}
+              blurOnSubmit={true}
+              placeholderTextColor="#4C4C4C"
+            />
+          </View>
+        </View>
+        <TouchableOpacity
+          underlayColor="transparent"
+          style={styles.signupButtonContainer}
+          onPress={handleSignUp}
+        >
+          <Text style={styles.signupButton}>Sign Up</Text>
         </TouchableOpacity>
+        {error && <Text style={styles.errorMessage}>{error}</Text>}
       </View>
-      <View style={styles.inputContainer}>
-        <View style={styles.inputIcon}>
-          <TextInput
-            style={styles.inputLabel}
-            placeholder="Email"
-            value={email}
-            onChangeText={(text) => setEmail(text)}
-          />
-        </View>
-      </View>
-      <View style={styles.inputContainer}>
-        <View style={styles.inputIcon}>
-          <TextInput
-            style={styles.inputLabel}
-            placeholder="Password"
-            secureTextEntry
-            value={password}
-            onChangeText={(text) => setPassword(text)}
-          />
-        </View>
-      </View>
-      <TouchableOpacity
-        underlayColor="transparent"
-        style={styles.signupButtonContainer}
-        onPress={handleSignUp}
-      >
-        <Text style={styles.signupButton}>Sign Up</Text>
-      </TouchableOpacity>
-      {error && <Text style={styles.errorMessage}>{error}</Text>}
-    </View>
+    </TouchableWithoutFeedback>
   );
 };
 
@@ -148,14 +217,19 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "#fff",
+    backgroundColor: "white",
+    borderRadius: 24,
+    width: 320,
+    height: 390,
+    // top: 10,
+    // left: 125,
   },
   backgroundOverlay: {
     position: "absolute",
     backgroundColor: "rgba(7, 54, 63, 0.8)",
     borderRadius: 24,
-    width: 350,
-    height: 340,
+    width: 370,
+    height: 440,
   },
   loginTitle: {
     fontFamily: "Poppins-Bold",
@@ -204,15 +278,19 @@ const styles = StyleSheet.create({
     color: "#848484",
     marginLeft: 10,
     fontSize: 20,
+    width: 295,
   },
   signupButtonContainer: {
     backgroundColor: "#00a3ff",
     borderRadius: 24,
-    width: 321,
-    height: 49,
+    width: 280,
+    height: 40,
     marginTop: 20,
+    marginBottom: 10,
     justifyContent: "center",
     alignItems: "center",
+    marginLeft: 20,
+    marginRight: 20,
   },
   signupButton: {
     fontFamily: "Poppins-Medium",
@@ -222,11 +300,20 @@ const styles = StyleSheet.create({
     textTransform: "uppercase",
     letterSpacing: 1,
   },
+  userIcon: {
+    marginLeft: 10,
+  },
+
   errorMessage: {
     fontFamily: "Poppins-Medium",
-    color: "red",
-    marginTop: 10,
-    fontSize: 16,
+    color: "#FD5D5D",
+    marginTop: 5,
+    fontSize: 14,
+    marginBottom: 20,
+    textDecorationLine: "underline",
+    marginLeft: 6,
+    marginRight: 6,
+    textAlign: "center",
   },
 });
 

@@ -175,47 +175,43 @@ const ChatScreen = () => {
       dispatch(updateItinerary(newItinerary));
 
       // Check if the user wants to save the itinerary in Firebase
-      Alert.alert(
-        "Save Itinerary",
-        "Do you want to save this itinerary to Firebase?",
-        [
-          {
-            text: "Cancel",
-            style: "cancel",
+      Alert.alert("Save Itinerary", "Do you want to save this itinerary?", [
+        {
+          text: "Cancel",
+          style: "cancel",
+        },
+        {
+          text: "Save",
+          onPress: async () => {
+            // Save the newItinerary to Firestore with UID
+            const firebaseConfig = {
+              apiKey: FIREBASE_API_KEY,
+              authDomain: FIREBASE_AUTH_DOMAIN,
+              projectId: FIREBASE_PROJECT_ID,
+              storageBucket: FIREBASE_STORAGE_BUCKET,
+              messagingSenderId: FIREBASE_MESSAGING_SENDER_ID,
+              appId: FIREBASE_APP_ID,
+            };
+
+            const app = initializeApp(firebaseConfig);
+            const db = getFirestore(app);
+
+            const itinerariesCollection = collection(db, "itineraries");
+
+            // Get the UID of the signed-in user
+            const user = auth.currentUser;
+            const uid = user ? user.uid : null;
+
+            // Add UID to the newItinerary object
+            const newItineraryWithUID = { ...newItinerary, uid };
+
+            await addDoc(itinerariesCollection, newItineraryWithUID);
+
+            // Navigate to HomeScreen with newItinerary data
+            navigation.navigate("Home", { newItinerary });
           },
-          {
-            text: "Save",
-            onPress: async () => {
-              // Save the newItinerary to Firestore with UID
-              const firebaseConfig = {
-                apiKey: FIREBASE_API_KEY,
-                authDomain: FIREBASE_AUTH_DOMAIN,
-                projectId: FIREBASE_PROJECT_ID,
-                storageBucket: FIREBASE_STORAGE_BUCKET,
-                messagingSenderId: FIREBASE_MESSAGING_SENDER_ID,
-                appId: FIREBASE_APP_ID,
-              };
-
-              const app = initializeApp(firebaseConfig);
-              const db = getFirestore(app);
-
-              const itinerariesCollection = collection(db, "itineraries");
-
-              // Get the UID of the signed-in user
-              const user = auth.currentUser;
-              const uid = user ? user.uid : null;
-
-              // Add UID to the newItinerary object
-              const newItineraryWithUID = { ...newItinerary, uid };
-
-              await addDoc(itinerariesCollection, newItineraryWithUID);
-
-              // Navigate to HomeScreen with newItinerary data
-              navigation.navigate("Home", { newItinerary });
-            },
-          },
-        ]
-      );
+        },
+      ]);
     } catch (error) {
       console.log(error);
     }
@@ -294,7 +290,7 @@ const ChatScreen = () => {
               paddingLeft: 10,
               marginRight: 10,
             }}
-            placeholder={"Travel to ___ for ___ days..."}
+            placeholder={`"Travel to ______ for __ days..."`}
           />
         )}
         const

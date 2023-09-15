@@ -6,6 +6,8 @@ import {
   Image,
   TouchableOpacity,
   TextInput,
+  TouchableWithoutFeedback,
+  Keyboard,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import firebase from "firebase/app";
@@ -18,6 +20,8 @@ import {
 import { collection, query, where, getDocs } from "firebase/firestore";
 import { getFirestore } from "firebase/firestore";
 import { useUser } from "../Providers/UserContext";
+import { FontAwesome } from "@expo/vector-icons";
+import { FontAwesome5 } from "@expo/vector-icons";
 
 import {
   FIREBASE_API_KEY,
@@ -39,16 +43,13 @@ const firebaseConfig = {
 
 // Initialize Firebase app
 const app = initializeApp(firebaseConfig);
-
-// Initialize Firebase Authentication
 const auth = getAuth(app);
-
 const db = getFirestore(app);
 
-// Define the fetchUserDataFromFirestore function
+// fetchUserDataFromFirestore function
 const fetchUserDataFromFirestore = async (userUid) => {
   try {
-    const userRef = collection(db, "users"); // Replace "users" with your Firestore collection name
+    const userRef = collection(db, "users");
     const userQuery = query(userRef, where("uid", "==", userUid));
     const userSnapshot = await getDocs(userQuery);
 
@@ -65,7 +66,7 @@ const fetchUserDataFromFirestore = async (userUid) => {
 
 const fetchUserItinerariesFromFirestore = async (userUid) => {
   try {
-    const itinerariesRef = collection(db, "itineraries"); // Replace "itineraries" with your Firestore collection name for itineraries
+    const itinerariesRef = collection(db, "itineraries");
     const itinerariesQuery = query(
       itinerariesRef,
       where("userUid", "==", userUid)
@@ -99,6 +100,7 @@ const LoginComponent = () => {
 
   const handleSignIn = async () => {
     try {
+      Keyboard.dismiss();
       const userCredential = await signInWithEmailAndPassword(
         auth,
         email,
@@ -122,12 +124,11 @@ const LoginComponent = () => {
       navigation.navigate("Home", { userData, userItineraries, userUid }); // Pass userUid as a parameter
     } catch (error) {
       if (email === "" || password === "") {
-        setError("All fields must be entered");
+        setError("All fields must be entered.");
       } else {
         const errorCode = error.code;
         let errorMessage = "An error occurred. Please try again.";
 
-        // Customize the error message based on the error code
         switch (errorCode) {
           case AuthErrorCodes.INVALID_EMAIL:
           case AuthErrorCodes.INVALID_PASSWORD:
@@ -149,62 +150,83 @@ const LoginComponent = () => {
   };
 
   return (
-    <View style={styles.container}>
-      <View style={styles.backgroundOverlay} />
-      <Text style={styles.loginTitle}>Login</Text>
-      <View style={styles.dontHaveAccountContainer}>
-        <Text style={styles.dontHaveAccountText}>Don't have an account?</Text>
-        <Text style={styles.signUp} onPress={handleClick}>
-          {" "}
-          Sign Up
-        </Text>
-      </View>
-      <View style={styles.inputContainer}>
-        <View style={styles.inputIcon}>
-          <TextInput
-            style={styles.inputLabel}
-            placeholder="Email"
-            value={email}
-            onChangeText={(text) => setEmail(text)}
-          />
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+      <View style={styles.container}>
+        <View style={styles.backgroundOverlay} />
+        <Text style={styles.loginTitle}>Login</Text>
+        <View style={styles.dontHaveAccountContainer}>
+          <Text style={styles.dontHaveAccountText}>Don't have an account?</Text>
+          <Text style={styles.signUp} onPress={handleClick}>
+            Sign Up
+          </Text>
         </View>
-      </View>
-      <View style={styles.inputContainer}>
-        <View style={styles.inputIcon}>
-          <TextInput
-            style={styles.inputLabel}
-            placeholder="Password"
-            secureTextEntry
-            value={password}
-            onChangeText={(text) => setPassword(text)}
-          />
+        <View style={styles.inputContainer}>
+          <View style={styles.inputIcon}>
+            <FontAwesome
+              style={styles.userIcon}
+              name="user"
+              size={28}
+              color="#6C6C6C"
+            />
+            <TextInput
+              style={styles.inputLabel}
+              placeholder="Email"
+              value={email}
+              onChangeText={(text) => setEmail(text)}
+              placeholderTextColor="#4C4C4C"
+              blurOnSubmit={true}
+            />
+          </View>
         </View>
+        <View style={styles.inputContainer}>
+          <View style={styles.inputIcon}>
+            <FontAwesome5
+              style={styles.userIcon}
+              name="key"
+              size={22.5}
+              color="#6C6C6C"
+            />
+            <TextInput
+              style={styles.inputLabel}
+              placeholder="Password"
+              secureTextEntry
+              value={password}
+              onChangeText={(text) => setPassword(text)}
+              placeholderTextColor="#4C4C4C"
+              blurOnSubmit={true}
+            />
+          </View>
+        </View>
+        <TouchableOpacity
+          underlayColor="transparent"
+          style={styles.loginButtonContainer}
+          onPress={handleSignIn}
+        >
+          <Text style={styles.loginButton}>Login</Text>
+        </TouchableOpacity>
+        {error && <Text style={styles.errorMessage}>{error}</Text>}
       </View>
-      <TouchableOpacity
-        underlayColor="transparent"
-        style={styles.loginButtonContainer}
-        onPress={handleSignIn}
-      >
-        <Text style={styles.loginButton}>Login</Text>
-      </TouchableOpacity>
-      {error && <Text style={styles.errorMessage}>{error}</Text>}
-    </View>
+    </TouchableWithoutFeedback>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    top: 10,
-    left: 125,
     alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "white",
+    borderRadius: 24,
+    paddingBottom: 10,
+    width: 320,
+    height: 330,
   },
   backgroundOverlay: {
     position: "absolute",
     backgroundColor: "rgba(7, 54, 63, 0.8)",
     borderRadius: 24,
-    width: 350,
-    height: 340,
+    width: 370,
+    height: 390,
   },
   loginTitle: {
     fontFamily: "Poppins-Bold",
@@ -227,6 +249,7 @@ const styles = StyleSheet.create({
   signUp: {
     fontFamily: "Poppins-Medium",
     color: "#00a3ff",
+    marginLeft: 5,
   },
   inputContainer: {
     flexDirection: "row",
@@ -251,16 +274,27 @@ const styles = StyleSheet.create({
     fontFamily: "Poppins-Medium",
     color: "#848484",
     marginLeft: 10,
-    fontSize: 20,
+    fontSize: 18,
+    width: 295,
+  },
+  inputLabel1: {
+    fontFamily: "Poppins-Medium",
+    color: "#848484",
+    marginLeft: 5,
+    fontSize: 18,
+    width: 295,
   },
   loginButtonContainer: {
     backgroundColor: "#00a3ff",
     borderRadius: 24,
-    width: 321,
-    height: 49,
+    width: 280,
+    height: 40,
     marginTop: 20,
+    marginBottom: 10,
     justifyContent: "center",
     alignItems: "center",
+    marginLeft: 20,
+    marginRight: 20,
   },
   loginButton: {
     fontFamily: "Poppins-Medium",
@@ -270,11 +304,15 @@ const styles = StyleSheet.create({
     textTransform: "uppercase",
     letterSpacing: 1,
   },
+  userIcon: {
+    marginLeft: 10,
+  },
   errorMessage: {
     fontFamily: "Poppins-Medium",
-    color: "red", // Change to your preferred error text color
+    color: "#FD5D5D",
     marginTop: 10,
-    fontSize: 16, // Change to your preferred font size
+    fontSize: 15,
+    textDecorationLine: "underline",
   },
 });
 

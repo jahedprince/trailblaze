@@ -73,6 +73,8 @@ const HomeScreen = () => {
     };
   }, [userData]);
 
+  const firstName = userData.name.split(" ")[0];
+
   // Define the deleteItinerary function
   const deleteItinerary = async (itineraryId) => {
     try {
@@ -146,7 +148,23 @@ const HomeScreen = () => {
         </View>
 
         <View style={styles.hello}>
-          <Text style={[styles.hello1, styles.hello1Clr]}>Hello...</Text>
+          <Text style={[styles.hello1, styles.hello1Clr]}>Hello,</Text>
+          <Text
+            style={[
+              styles.hello2,
+              styles.hello1Clr2,
+              firstName.length > 6 && { fontSize: 45 },
+              firstName.length >= 7 && { fontSize: 39 },
+              firstName.length >= 8 && { fontSize: 35 },
+              firstName.length >= 9 && { fontSize: 32 },
+              firstName.length >= 10 && { fontSize: 29 },
+              firstName.length >= 11 && { fontSize: 24 },
+              firstName.length >= 12 && { fontSize: 20 },
+              firstName.length >= 13 && { fontSize: 16 },
+            ]}
+          >
+            {firstName}
+          </Text>
           <Image
             style={styles.helloChild}
             resizeMode="cover"
@@ -229,9 +247,24 @@ const styles = StyleSheet.create({
     top: 25,
     position: "absolute",
   },
+  hello1Clr2: {
+    color: "#fff",
+    textAlign: "left",
+  },
+  hello2: {
+    marginTop: 5,
+    fontSize: 54,
+    fontFamily: "Poppins-Bold",
+    textAlign: "left",
+    lineHeight: 62,
+    color: "#fff",
+    left: 0,
+    top: 75,
+    position: "absolute",
+  },
   helloChild: {
     top: 75,
-    left: 200,
+    left: 205,
     width: 63,
     height: 50,
     position: "absolute",
