@@ -1,19 +1,22 @@
 {
   "expo": {
-    "name": "trailblaze",
-    "slug": "trailblaze",
+    "name": "TrailBlaze",
+    "slug": "TrailBlaze",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
-    "userInterfaceStyle": "light",
+    "icon": "./assets/trailblaze.png",
+    "userInterfaceStyle": "dark",
     "splash": {
       "image": "./assets/splash.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
-    "assetBundlePatterns": ["**/*"],
+    "assetBundlePatterns": [
+      "**/*"
+    ],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.jahedprince.TrailBlaze"
     },
     "android": {
       "adaptiveIcon": {
@@ -22,10 +25,12 @@
       }
     },
     "web": {
-      "build": {
-        "output": "web-build"
-      },
       "favicon": "./assets/favicon.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "2cc8df77-8f14-4b29-9297-75e9b70d7d24"
+      }
     }
   }
 }

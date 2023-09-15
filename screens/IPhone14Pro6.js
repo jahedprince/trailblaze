@@ -26,13 +26,13 @@ const IPhone14Pro = () => {
       style={styles.backgroundImage}
     >
       <View style={styles.iphone14Pro}>
-        <Text style={styles.bonVoyageIn}>Bon Voyage in Style</Text>
+        <Text style={styles.bonVoyageIn}>TrailBlaze</Text>
         <Text style={styles.letTheClassicContainer}>
           <Text style={styles.letTheClassic}>
-            {`Let the classic American riverboat transport you to `}
+            {`Your Personalized Journey Planner`}
           </Text>
-          <Text style={styles.newAdventures}>New Adventures — </Text>
-          <Text style={styles.letTheClassic}>and back in time.</Text>
+          <Text style={styles.newAdventures}> – Where Adventure Begins,</Text>
+          <Text style={styles.letTheClassic}> Memories Never End!</Text>
         </Text>
 
         <View
@@ -86,7 +86,7 @@ const styles = StyleSheet.create({
     zIndex: -1,
   },
   bonVoyageIn: {
-    top: 115,
+    top: 130,
     left: 34,
     fontSize: 62,
     fontFamily: "Submaster",
@@ -106,7 +106,7 @@ const styles = StyleSheet.create({
     color: "#fee53f",
   },
   letTheClassicContainer: {
-    top: 255,
+    top: 205,
     left: 34,
     width: 320,
     textAlign: "left",
