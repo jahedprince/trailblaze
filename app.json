@@ -22,6 +22,9 @@
       }
     },
     "web": {
+      "build": {
+        "output": "web-build"
+      },
       "favicon": "./assets/favicon.png"
     }
   }
