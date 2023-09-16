@@ -11,12 +11,9 @@
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
-    "assetBundlePatterns": [
-      "**/*"
-    ],
+    "assetBundlePatterns": ["**/*"],
     "ios": {
-      "supportsTablet": true,
-      "bundleIdentifier": "com.jahedprince.TrailBlaze"
+      "supportsTablet": true
     },
     "android": {
       "adaptiveIcon": {
@@ -31,6 +28,16 @@
       "eas": {
         "projectId": "2cc8df77-8f14-4b29-9297-75e9b70d7d24"
       }
-    }
+    },
+    "plugins": [
+      [
+        "expo-build-properties",
+        {
+          "ios": {
+            "useFrameworks": "static"
+          }
+        }
+      ]
+    ]
   }
 }
