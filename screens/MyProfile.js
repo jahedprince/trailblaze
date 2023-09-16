@@ -346,7 +346,7 @@ const MyProfile = () => {
                 style={styles.pfp1}
                 name="user"
                 size={100}
-                color="#6C6C6C"
+                color="white"
               />
             )}
           </View>

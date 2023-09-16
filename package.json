@@ -11,7 +11,7 @@
   },
   "dependencies": {
     "@expo/webpack-config": "^18.1.3",
-    "@react-native-async-storage/async-storage": "^1.18.2",
+    "@react-native-async-storage/async-storage": "^1.19.3",
     "@react-native-community/viewpager": "^5.0.11",
     "@react-native-firebase/app": "^18.4.0",
     "@react-native-firebase/firestore": "^18.3.0",
