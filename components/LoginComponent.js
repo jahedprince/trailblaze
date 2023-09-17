@@ -108,6 +108,13 @@ const LoginComponent = () => {
         password
       );
       const user = userCredential.user;
+
+      // Check if the user's email is verified
+      if (!user.emailVerified) {
+        setError("Verify your email before signing in");
+        return;
+      }
+
       console.log("User signed in:", user);
 
       // Set the user's UID
@@ -132,10 +139,18 @@ const LoginComponent = () => {
         const errorCode = error.code;
         let errorMessage = "An error occurred. Please try again.";
 
+        console.log(errorCode);
+
         switch (errorCode) {
-          case AuthErrorCodes.INVALID_EMAIL:
-          case AuthErrorCodes.INVALID_PASSWORD:
+          case "auth/invalid-email":
+          case "auth/invalid-password":
             errorMessage = "Email and/or password may be wrong.";
+            break;
+          case "auth/user-not-found":
+            errorMessage = "User not found. Please check your credentials.";
+            break;
+          case "auth/too-many-requests":
+            errorMessage = "Too many requests. Please try again later.";
             break;
 
           // Add more cases as needed

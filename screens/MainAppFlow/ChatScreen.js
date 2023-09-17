@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -9,6 +9,8 @@ import {
   Image,
   TouchableOpacity,
   Alert,
+  Platform,
+  Keyboard,
 } from "react-native";
 import axios from "axios"; // Import axios or use fetch
 import {
@@ -49,6 +51,7 @@ const ChatScreen = () => {
   const navigation = useNavigation();
   const [messages, setMessages] = useState([]);
   const { userData } = useUser();
+  const [isKeyboardVisible, setKeyboardVisible] = useState(false);
 
   const apiKey = FIREBASE_API_KEY2;
 
@@ -217,6 +220,26 @@ const ChatScreen = () => {
     }
   };
 
+  useEffect(() => {
+    const keyboardDidShowListener = Keyboard.addListener(
+      Platform.OS === "ios" ? "keyboardWillShow" : "keyboardDidShow",
+      () => {
+        setKeyboardVisible(true);
+      }
+    );
+    const keyboardDidHideListener = Keyboard.addListener(
+      Platform.OS === "ios" ? "keyboardWillHide" : "keyboardDidHide",
+      () => {
+        setKeyboardVisible(false);
+      }
+    );
+
+    return () => {
+      keyboardDidShowListener.remove();
+      keyboardDidHideListener.remove();
+    };
+  }, []);
+
   return (
     <View style={styles.container}>
       <View style={styles.backgroundContainer}>
@@ -323,7 +346,7 @@ const ChatScreen = () => {
         )}
         renderAvatar={() => null}
       />
-      <BottomNavigation />
+      {!isKeyboardVisible && <BottomNavigation />}
     </View>
   );
 };

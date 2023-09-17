@@ -9,6 +9,8 @@ import {
   TouchableOpacity,
   TextInput,
   Button,
+  TouchableWithoutFeedback,
+  Keyboard,
 } from "react-native";
 import { initializeApp } from "firebase/app";
 import {
@@ -273,36 +275,38 @@ const ItineraryDetailsScreen = ({ route }) => {
   };
 
   return (
-    <View style={styles.container}>
-      <View style={styles.backgroundContainer}>
-        <View style={styles.hello}>
-          <Text style={[styles.hello1, styles.hello1Clr]}>
-            Itinerary Details
-          </Text>
-          <Image
-            style={styles.helloChild}
-            resizeMode="cover"
-            source={require("../../assets/Frame.png")} // Replace with the actual image path
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+      <View style={styles.container}>
+        <View style={styles.backgroundContainer}>
+          <View style={styles.hello}>
+            <Text style={[styles.hello1, styles.hello1Clr]}>
+              Itinerary Details
+            </Text>
+            <Image
+              style={styles.helloChild}
+              resizeMode="cover"
+              source={require("../../assets/Frame.png")} // Replace with the actual image path
+            />
+          </View>
+        </View>
+
+        <View style={styles.itineraryContainer}>
+          <Text style={styles.destination}>{itinerary.destination} </Text>
+          <Text
+            style={styles.duration}
+          >{`Duration: ${itinerary.duration} days`}</Text>
+
+          <FlatList
+            style={styles.itineraryList}
+            data={itinerary.days}
+            renderItem={renderDayItem}
+            keyExtractor={(item, index) => `${index}`}
           />
         </View>
+
+        <BottomNavigation style={styles.navigation} />
       </View>
-
-      <View style={styles.itineraryContainer}>
-        <Text style={styles.destination}>{itinerary.destination} </Text>
-        <Text
-          style={styles.duration}
-        >{`Duration: ${itinerary.duration} days`}</Text>
-
-        <FlatList
-          style={styles.itineraryList}
-          data={itinerary.days}
-          renderItem={renderDayItem}
-          keyExtractor={(item, index) => `${index}`}
-        />
-      </View>
-
-      <BottomNavigation style={styles.navigation} />
-    </View>
+    </TouchableWithoutFeedback>
   );
 };
 

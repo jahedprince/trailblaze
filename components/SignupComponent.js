@@ -21,6 +21,7 @@ import { getFirestore } from "firebase/firestore";
 import { FontAwesome } from "@expo/vector-icons";
 import { FontAwesome5 } from "@expo/vector-icons";
 import { Ionicons } from "@expo/vector-icons";
+import { sendEmailVerification } from "firebase/auth";
 
 import {
   FIREBASE_API_KEY,
@@ -91,6 +92,9 @@ const SignupComponent = () => {
       const user = userCredential.user;
       console.log("User signed up:", user);
 
+      // Send email verification
+      await sendVerificationEmail(user);
+
       // Create a Firestore document for the user with UID as document ID
       const userDocRef = doc(db, "users", user.uid);
       // Set the document data, including the user's name
@@ -101,8 +105,11 @@ const SignupComponent = () => {
         // Add other user data here
         profilePictureUrl,
       });
+
       // Redirect to the login page or any desired screen
       navigation.navigate("signin");
+
+      setError(null);
     } catch (error) {
       const errorCode = error.code;
       console.error("Firebase Error Code:", errorCode); // Print the error code to the console
@@ -129,6 +136,15 @@ const SignupComponent = () => {
 
       setError(errorMessage);
       console.error("Registration error:", error);
+    }
+  };
+
+  const sendVerificationEmail = async (user) => {
+    try {
+      await sendEmailVerification(user);
+      console.log("Verification email sent.");
+    } catch (error) {
+      console.error("Error sending verification email:", error);
     }
   };
 

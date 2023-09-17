@@ -23,6 +23,9 @@ import {
 import {
   fetchSignInMethodsForEmail,
   createUserWithEmailAndPassword,
+  deleteUser,
+  reauthenticateWithCredential,
+  EmailAuthProvider,
 } from "firebase/auth";
 import {
   getFirestore,
@@ -33,6 +36,7 @@ import {
   where,
   getDocs,
   getDoc,
+  deleteDoc,
 } from "firebase/firestore";
 import {
   getStorage,
@@ -66,6 +70,9 @@ const MyProfile = () => {
   const [profilePicture, setProfilePicture] = useState(null); // To store the user's profile picture URL
   const [profilePictureFile, setProfilePictureFile] = useState(null); // To store the selected profile picture file
   const [profilePictureUrl, setProfilePictureUrl] = useState(null);
+  const [passwordInput, setPasswordInput] = useState(""); // State to store the password input
+  const [isDeleteModalVisible, setDeleteModalVisible] = useState(false);
+  const [deleteError, setDeleteError] = useState(""); // State to store deletion error messages
 
   const auth = getAuth();
   const db = getFirestore();
@@ -302,6 +309,36 @@ const MyProfile = () => {
     }
   };
 
+  // ...
+
+  const handleDeleteAccount = async () => {
+    try {
+      const user = auth.currentUser;
+
+      if (!user) {
+        // User is not authenticated
+        setDeleteError("User not authenticated");
+        return;
+      }
+
+      // Re-authenticate the user with their current password
+      const credential = EmailAuthProvider.credential(user.email, password);
+      await reauthenticateWithCredential(user, credential);
+
+      // Delete the user's account
+      await deleteUser(user);
+
+      // Sign the user out after account deletion
+      await signOut(auth);
+
+      // Redirect to the landing page or any other desired action
+      navigation.navigate("IPhone14Pro6"); // Replace "Landing" with your landing page route
+    } catch (error) {
+      // Handle account deletion errors, e.g., display an error message to the user
+      setDeleteError("Error deleting account. Please try again.");
+    }
+  };
+
   const isLongName = name.length > 18;
   const isLongLongName = name.length > 30;
 
@@ -323,6 +360,12 @@ const MyProfile = () => {
   const togglePasswordModal = () => {
     setPassword("");
     setPasswordModalVisible(!isPasswordModalVisible);
+  };
+
+  const toggleDeleteModal = () => {
+    setDeleteModalVisible(!isDeleteModalVisible);
+    setPassword(""); // Clear the password input field when opening/closing the modal
+    setDeleteError(""); // Clear any previous error messages
   };
 
   return (
@@ -510,6 +553,42 @@ const MyProfile = () => {
               <Text style={[styles.email1, styles.nameTypo1]}>LOGOUT</Text>
             </View>
           </TouchableOpacity>
+
+          <TouchableOpacity onPress={toggleDeleteModal}>
+            <View style={[styles.airportCrad5, styles.airportLayout]}>
+              <View
+                style={[styles.airportCradChild5, styles.frameViewPosition1]}
+              />
+              <Text style={styles.nameTypo2}>DELETE ACCOUNT</Text>
+            </View>
+          </TouchableOpacity>
+
+          <Modal
+            visible={isDeleteModalVisible}
+            animationType="slide"
+            transparent={true}
+          >
+            <View style={styles.modalContainer}>
+              <View style={styles.modalContent}>
+                <Text style={styles.modalTitle}>Confirm Deletion</Text>
+                <Text>Please enter your password to confirm:</Text>
+                <TextInput
+                  style={styles.passwordInput}
+                  secureTextEntry={true}
+                  placeholder="Password"
+                  value={password}
+                  onChangeText={(text) => setPassword(text)}
+                />
+                <Text style={styles.errorText}>{deleteError}</Text>
+                <TouchableOpacity onPress={handleDeleteAccount}>
+                  <Text style={styles.confirmButton}>Confirm</Text>
+                </TouchableOpacity>
+                <TouchableOpacity onPress={toggleDeleteModal}>
+                  <Text style={styles.cancelButton}>Cancel</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </Modal>
         </View>
       </View>
       <BottomNavigation style={styles.navigation} />
@@ -519,6 +598,27 @@ const MyProfile = () => {
 
 const styles = StyleSheet.create({
   // Add these styles for modals
+  passwordInput: {
+    height: 40,
+    borderColor: "gray",
+    borderWidth: 1,
+    borderRadius: 5,
+    marginBottom: 10,
+    paddingLeft: 5,
+    color: "#fff",
+  },
+  errorText: {
+    color: "red",
+    marginBottom: 10,
+  },
+  confirmButton: {
+    color: "green",
+    marginBottom: 10,
+    fontFamily: "Overpass-SemiBold",
+    textAlign: "center",
+    fontSize: 19,
+  },
+
   modalTitle: {
     fontSize: 24,
     fontFamily: "Overpass-Bold",
@@ -555,12 +655,7 @@ const styles = StyleSheet.create({
     borderRadius: 24, // Match your app's border radius
     width: 300,
   },
-  modalTitle: {
-    fontSize: 24, // Adjust font size as needed
-    fontFamily: "Overpass-Bold",
-    marginBottom: 10,
-    color: "#fff", // Match your app's text color
-  },
+
   modalInput: {
     borderWidth: 1,
     borderColor: "#6C6C6C", // Match your app's input border color
@@ -629,6 +724,7 @@ const styles = StyleSheet.create({
     left: 0,
     top: 0,
   },
+
   reactLayout: {
     width: 50,
     height: 48,
@@ -645,9 +741,17 @@ const styles = StyleSheet.create({
   },
   nameTypo1: {
     fontFamily: "Overpass-SemiBold",
-    lineHeight: 55,
+    lineHeight: 70,
     letterSpacing: 1,
     fontSize: 30,
+    textAlign: "center",
+    color: "#fff",
+  },
+  nameTypo2: {
+    fontFamily: "Overpass-SemiBold",
+    lineHeight: 40,
+    letterSpacing: 1,
+    fontSize: 20,
     textAlign: "center",
     color: "#fff",
   },
@@ -721,7 +825,12 @@ const styles = StyleSheet.create({
     position: "absolute",
   },
   airportCradChild4: {
-    height: 50,
+    height: 60,
+    width: 365,
+    position: "absolute",
+  },
+  airportCradChild5: {
+    height: 40,
     width: 365,
     position: "absolute",
   },
@@ -811,6 +920,10 @@ const styles = StyleSheet.create({
   },
   airportCrad4: {
     top: 360,
+    left: 0,
+  },
+  airportCrad5: {
+    top: 430,
     left: 0,
   },
 

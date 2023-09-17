@@ -7,6 +7,8 @@ import {
   StyleSheet,
   TouchableOpacity,
   Image,
+  Keyboard,
+  TouchableWithoutFeedback,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { useRoute } from "@react-navigation/native";
@@ -127,64 +129,66 @@ const HomeScreen = () => {
   );
 
   return (
-    <View style={styles.container}>
-      <View style={styles.backgroundContainer}>
-        <View style={styles.hiGif}>
-          <LinearGradient
-            style={styles.childPosition}
-            locations={[0, 1]}
-            colors={["#bca5ed", "#bca5ed"]}
-            useAngle={true}
-            angle={180}
-          />
-          <Image
-            style={[
-              styles.c60ee25f093d85a18569d288610075Icon,
-              styles.hiGifChildLayout,
-            ]}
-            resizeMode="cover"
-            source={require("../../assets/65cb5e914bea8968c52a39b7a42e0b8c22c60ee25f093d85a18569d288610075-1.png")} // Replace with the actual image path
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+      <View style={styles.container}>
+        <View style={styles.backgroundContainer}>
+          <View style={styles.hiGif}>
+            <LinearGradient
+              style={styles.childPosition}
+              locations={[0, 1]}
+              colors={["#bca5ed", "#bca5ed"]}
+              useAngle={true}
+              angle={180}
+            />
+            <Image
+              style={[
+                styles.c60ee25f093d85a18569d288610075Icon,
+                styles.hiGifChildLayout,
+              ]}
+              resizeMode="cover"
+              source={require("../../assets/65cb5e914bea8968c52a39b7a42e0b8c22c60ee25f093d85a18569d288610075-1.png")} // Replace with the actual image path
+            />
+          </View>
+
+          <View style={styles.hello}>
+            <Text style={[styles.hello1, styles.hello1Clr]}>Hello,</Text>
+            <Text
+              style={[
+                styles.hello2,
+                styles.hello1Clr2,
+                firstName.length > 6 && { fontSize: 45 },
+                firstName.length >= 7 && { fontSize: 39 },
+                firstName.length >= 8 && { fontSize: 35 },
+                firstName.length >= 9 && { fontSize: 32 },
+                firstName.length >= 10 && { fontSize: 29 },
+                firstName.length >= 11 && { fontSize: 24 },
+                firstName.length >= 12 && { fontSize: 20 },
+                firstName.length >= 13 && { fontSize: 16 },
+              ]}
+            >
+              {firstName}
+            </Text>
+            <Image
+              style={styles.helloChild}
+              resizeMode="cover"
+              source={require("../../assets/Frame.png")} // Replace with the actual image path
+            />
+          </View>
+        </View>
+
+        <View style={styles.itineraryContainer}>
+          <Text style={styles.title}>My Itineraries</Text>
+          <FlatList
+            style={styles.itineraryList}
+            data={itineraries}
+            renderItem={renderItineraryItem}
+            keyExtractor={(item) => item.id}
           />
         </View>
 
-        <View style={styles.hello}>
-          <Text style={[styles.hello1, styles.hello1Clr]}>Hello,</Text>
-          <Text
-            style={[
-              styles.hello2,
-              styles.hello1Clr2,
-              firstName.length > 6 && { fontSize: 45 },
-              firstName.length >= 7 && { fontSize: 39 },
-              firstName.length >= 8 && { fontSize: 35 },
-              firstName.length >= 9 && { fontSize: 32 },
-              firstName.length >= 10 && { fontSize: 29 },
-              firstName.length >= 11 && { fontSize: 24 },
-              firstName.length >= 12 && { fontSize: 20 },
-              firstName.length >= 13 && { fontSize: 16 },
-            ]}
-          >
-            {firstName}
-          </Text>
-          <Image
-            style={styles.helloChild}
-            resizeMode="cover"
-            source={require("../../assets/Frame.png")} // Replace with the actual image path
-          />
-        </View>
+        <BottomNavigation style={styles.navigation} />
       </View>
-
-      <View style={styles.itineraryContainer}>
-        <Text style={styles.title}>My Itineraries</Text>
-        <FlatList
-          style={styles.itineraryList}
-          data={itineraries}
-          renderItem={renderItineraryItem}
-          keyExtractor={(item) => item.id}
-        />
-      </View>
-
-      <BottomNavigation style={styles.navigation} />
-    </View>
+    </TouchableWithoutFeedback>
   );
 };
 
