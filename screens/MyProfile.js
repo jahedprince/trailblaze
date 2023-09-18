@@ -843,7 +843,7 @@ const styles = StyleSheet.create({
   },
 
   airportCrad: {
-    top: windowHeight * 0.21,
+    top: windowHeight * 0.2,
     width: 360,
     height: 340,
     position: "absolute",
