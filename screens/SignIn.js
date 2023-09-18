@@ -23,14 +23,8 @@ const SignIn = () => {
         source={require("../assets/cover2.png")}
         style={styles.backgroundImage}
       >
-        <View style={styles.iphone14Pro}>
-          <View
-            style={[
-              styles.ellipseParent,
-              styles.groupChildLayout,
-              styles.centeredAtBottom,
-            ]}
-          >
+        <View style={styles.container}>
+          <View style={[styles.ellipseParent, styles.centeredAtBottom]}>
             <LoginComponent />
           </View>
         </View>
@@ -47,18 +41,18 @@ const styles = StyleSheet.create({
   unsplashrajnd0b3hdwIcon: {
     zIndex: -1,
   },
-  groupChild: {
-    opacity: 0.7,
-    left: 0,
-    top: 0,
+  container: {
+    flex: 1,
+    textAlign: "center",
+    justifyContent: "center",
+    alignItems: "center",
   },
   ellipseParent: {
     position: "absolute",
   },
   centeredAtBottom: {
     alignItems: "center",
-    top: windowHeight * 0.3,
-    left: windowWidth * 0.13,
+    justifyContent: "center",
   },
 });
 

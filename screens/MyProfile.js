@@ -8,6 +8,7 @@ import {
   TouchableOpacity,
   TextInput,
   ImagePickerIOS,
+  Dimensions,
 } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 import { FontAwesome } from "@expo/vector-icons";
@@ -50,6 +51,9 @@ import BottomNavigation from "../components/BottomNavigation";
 import { useNavigation } from "@react-navigation/native";
 import * as ImagePicker from "expo-image-picker";
 import { uploadBytesResumable } from "firebase/storage";
+
+const windowWidth = Dimensions.get("window").width;
+const windowHeight = Dimensions.get("window").height;
 
 const MyProfile = () => {
   const navigation = useNavigation();
@@ -245,7 +249,7 @@ const MyProfile = () => {
       const result = await ImagePicker.launchImageLibraryAsync({
         mediaTypes: ImagePicker.MediaTypeOptions.Images,
         allowsEditing: true,
-        aspect: [1, 1], // You can adjust this aspect ratio as needed
+        aspect: [1, 1],
         quality: 1, // Image quality (0 to 1)
       });
 
@@ -309,8 +313,6 @@ const MyProfile = () => {
     }
   };
 
-  // ...
-
   const handleDeleteAccount = async () => {
     try {
       const user = auth.currentUser;
@@ -332,7 +334,7 @@ const MyProfile = () => {
       await signOut(auth);
 
       // Redirect to the landing page or any other desired action
-      navigation.navigate("IPhone14Pro6"); // Replace "Landing" with your landing page route
+      navigation.navigate("IPhone14Pro6");
     } catch (error) {
       // Handle account deletion errors, e.g., display an error message to the user
       setDeleteError("Error deleting account. Please try again.");
@@ -349,7 +351,7 @@ const MyProfile = () => {
   const toggleNameModal = () => {
     setNameModalVisible(!isNameModalVisible);
     // Reset the newName state when closing the modal
-    setNewName(""); // Add this line
+    setNewName("");
   };
 
   const toggleEmailModal = () => {
@@ -381,7 +383,7 @@ const MyProfile = () => {
         </View>
 
         <TouchableOpacity onPress={toggleImageModal}>
-          <View style={styles.pfp}>
+          <TouchableOpacity onPress={toggleImageModal} style={styles.pfp}>
             {profilePictureUrl ? (
               <Image source={{ uri: profilePictureUrl }} style={styles.pfp1} />
             ) : (
@@ -392,7 +394,7 @@ const MyProfile = () => {
                 color="white"
               />
             )}
-          </View>
+          </TouchableOpacity>
         </TouchableOpacity>
 
         <Modal
@@ -432,18 +434,21 @@ const MyProfile = () => {
 
         <View style={styles.airportCrad}>
           <TouchableOpacity onPress={toggleNameModal}>
-            <View style={[styles.airportCrad1, styles.airportLayout]}>
+            <TouchableOpacity
+              onPress={toggleNameModal}
+              style={[styles.airportCrad1, styles.airportLayout]}
+            >
               <View
                 style={[styles.airportCradChild, styles.frameViewPosition]}
               />
               <FontAwesome
-                style={[styles.reactIconsfafauser, styles.reactLayout]}
+                style={[styles.reactIconsfafauser]}
                 name="user"
                 size={50}
                 color="#6C6C6C"
               />
               <Text style={[styles.email, styles.nameTypo]}>NAME</Text>
-            </View>
+            </TouchableOpacity>
           </TouchableOpacity>
           <Modal
             visible={isNameModalVisible}
@@ -469,18 +474,21 @@ const MyProfile = () => {
             </View>
           </Modal>
           <TouchableOpacity onPress={toggleEmailModal}>
-            <View style={[styles.airportCrad2, styles.airportLayout]}>
+            <TouchableOpacity
+              onPress={toggleEmailModal}
+              style={[styles.airportCrad2, styles.airportLayout]}
+            >
               <View
                 style={[styles.airportCradChild, styles.frameViewPosition]}
               />
               <MaterialIcons
-                style={[styles.reactIconsfafaenvelope, styles.reactLayout]}
+                style={[styles.reactIconsfafaenvelope]}
                 name="email"
                 size={50}
                 color="#6C6C6C"
               />
               <Text style={[styles.email, styles.nameTypo]}>EMAIL</Text>
-            </View>
+            </TouchableOpacity>
           </TouchableOpacity>
 
           <Modal
@@ -508,18 +516,21 @@ const MyProfile = () => {
           </Modal>
 
           <TouchableOpacity onPress={togglePasswordModal}>
-            <View style={[styles.airportCrad3, styles.airportLayout]}>
+            <TouchableOpacity
+              onPress={togglePasswordModal}
+              style={[styles.airportCrad3, styles.airportLayout]}
+            >
               <View
                 style={[styles.airportCradChild, styles.frameViewPosition]}
               />
               <Ionicons
-                style={[styles.reactIconsfafakey, styles.reactLayout]}
+                style={[styles.reactIconsfafakey]}
                 name="key"
                 size={50}
                 color="#6C6C6C"
               />
               <Text style={[styles.email, styles.nameTypo]}>PASSWORD</Text>
-            </View>
+            </TouchableOpacity>
           </TouchableOpacity>
           <Modal
             visible={isPasswordModalVisible}
@@ -546,21 +557,27 @@ const MyProfile = () => {
             </View>
           </Modal>
           <TouchableOpacity onPress={handleLogout}>
-            <View style={[styles.airportCrad4, styles.airportLayout]}>
+            <TouchableOpacity
+              onPress={handleLogout}
+              style={[styles.airportCrad4, styles.airportLayout]}
+            >
               <View
                 style={[styles.airportCradChild4, styles.frameViewPosition1]}
               />
               <Text style={[styles.email1, styles.nameTypo1]}>LOGOUT</Text>
-            </View>
+            </TouchableOpacity>
           </TouchableOpacity>
 
           <TouchableOpacity onPress={toggleDeleteModal}>
-            <View style={[styles.airportCrad5, styles.airportLayout]}>
+            <TouchableOpacity
+              onPress={toggleDeleteModal}
+              style={[styles.airportCrad5, styles.airportLayout]}
+            >
               <View
                 style={[styles.airportCradChild5, styles.frameViewPosition1]}
               />
               <Text style={styles.nameTypo2}>DELETE ACCOUNT</Text>
-            </View>
+            </TouchableOpacity>
           </TouchableOpacity>
 
           <Modal
@@ -597,7 +614,7 @@ const MyProfile = () => {
 };
 
 const styles = StyleSheet.create({
-  // Add these styles for modals
+  // modals
   passwordInput: {
     height: 40,
     borderColor: "gray",
@@ -618,7 +635,6 @@ const styles = StyleSheet.create({
     textAlign: "center",
     fontSize: 19,
   },
-
   modalTitle: {
     fontSize: 24,
     fontFamily: "Overpass-Bold",
@@ -640,8 +656,8 @@ const styles = StyleSheet.create({
     marginBottom: 5,
   },
   pfp1: {
-    width: 100,
-    height: 100,
+    width: 200,
+    height: 200,
   },
   modalContainer: {
     flex: 1,
@@ -650,30 +666,30 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(0, 0, 0, 0.7)",
   },
   modalContent: {
-    backgroundColor: "#070606", // Match your app's background color
+    backgroundColor: "#070606",
     padding: 20,
-    borderRadius: 24, // Match your app's border radius
+    borderRadius: 24,
     width: 300,
   },
 
   modalInput: {
     borderWidth: 1,
-    borderColor: "#6C6C6C", // Match your app's input border color
+    borderColor: "#6C6C6C",
     padding: 10,
     marginBottom: 10,
     fontSize: 15,
     fontFamily: "Overpass-Regular",
-    color: "#fff", // Match your app's text color
+    color: "#fff",
   },
   saveButton: {
-    color: "#28A745", // Match your app's save button color
+    color: "#28A745",
     fontFamily: "Overpass-SemiBold",
     textAlign: "center",
     fontSize: 19,
     marginBottom: 5,
   },
   cancelButton: {
-    color: "#DC3545", // Match your app's cancel button color
+    color: "#DC3545",
     fontFamily: "Overpass-SemiBold",
     textAlign: "center",
     fontSize: 19,
@@ -689,19 +705,9 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
   },
-  tripText1FlexBox: {
-    justifyContent: "center",
-    alignItems: "center",
-    position: "absolute",
-  },
 
-  helloLayout: {
-    height: 48,
-    position: "absolute",
-  },
   hiJahedPrince1Typo: {
     fontFamily: "Poppins-Medium",
-    fontWeight: "500",
     textTransform: "uppercase",
     letterSpacing: 1,
     textAlign: "center",
@@ -725,100 +731,68 @@ const styles = StyleSheet.create({
     top: 0,
   },
 
-  reactLayout: {
-    width: 50,
-    height: 48,
-    position: "absolute",
-  },
+  // name, email, password
+
   nameTypo: {
     fontFamily: "Overpass-SemiBold",
     fontWeight: "600",
-    lineHeight: 50,
-    letterSpacing: 0,
-    fontSize: 40,
+    letterSpacing: 0.1,
+    fontSize: windowWidth * 0.09,
     textAlign: "left",
     color: "#fff",
   },
+
+  // logout typo
   nameTypo1: {
     fontFamily: "Overpass-SemiBold",
     lineHeight: 70,
     letterSpacing: 1,
-    fontSize: 30,
+    fontSize: windowWidth * 0.08,
+    justifyContent: "center",
+    alignContent: "center",
     textAlign: "center",
     color: "#fff",
   },
+
+  // delete typo
   nameTypo2: {
     fontFamily: "Overpass-SemiBold",
     lineHeight: 40,
     letterSpacing: 1,
-    fontSize: 20,
+    fontSize: windowWidth * 0.05,
     textAlign: "center",
     color: "#fff",
-  },
-  nameLayout: {
-    width: 136,
-    height: 48,
-    position: "absolute",
-  },
-  frameViewLayout: {
-    height: 101,
-    width: 365,
-    position: "absolute",
-  },
-  reactPosition: {
-    top: 15,
-    position: "absolute",
-  },
-  materialSymbolshome1: {
-    width: 24,
-    height: 24,
-    left: 0,
-    top: 0,
-    position: "absolute",
-    overflow: "hidden",
-  },
-  vectorParent: {
-    alignItems: "center",
-    flexDirection: "row",
+    marginTop: 2,
   },
 
-  myProfile1: {
-    top: 5,
-    fontSize: 38,
-    lineHeight: 38,
-    fontWeight: "700",
-    fontFamily: "Poppins-Bold",
-    textAlign: "left",
-    color: "#fff",
-    left: 0,
-    position: "absolute",
-  },
+  //Hi, lets explore
 
-  tripText1: {
-    top: 363,
-    left: 46,
-  },
   hiJahedPrince1: {
-    top: 282,
-
-    fontSize: 32,
+    // top: 282,
+    top: windowHeight * 0.304,
+    fontSize: windowWidth * 0.07,
     lineHeight: 48,
     color: "#f7ff88",
     alignItems: "center",
     alignContent: "center",
     justifyContent: "center",
   },
-  profilePic: {
-    left: 200,
-  },
   letsExploreThe1: {
-    top: 317,
+    top: windowHeight * 0.344,
     textAlign: "center",
-
-    fontSize: 20,
+    fontSize: windowWidth * 0.045,
+    justifyContent: "center",
+    alignItems: "center",
     lineHeight: 30,
     color: "rgba(255, 255, 255, 0.8)",
   },
+
+  //pfp
+  pfp: {
+    top: windowHeight * -0.03,
+    left: windowWidth * 0.12,
+  },
+
   airportCradChild: {
     height: 100,
     width: 365,
@@ -834,123 +808,71 @@ const styles = StyleSheet.create({
     width: 365,
     position: "absolute",
   },
-  airportCrad1: {
-    left: 4,
-    top: 0,
-  },
+
   reactIconsfafaenvelope: {
-    left: 39,
-    top: 22,
+    left: windowWidth * 0.08,
+    top: windowHeight * 0.025,
   },
   reactIconsfafakey: {
-    left: 39,
-    top: 22,
+    left: windowWidth * 0.08,
+    top: windowHeight * 0.025,
+  },
+  reactIconsfafauser: {
+    left: windowWidth * 0.095,
+    top: windowHeight * 0.025,
   },
   email: {
-    left: 100,
+    left: windowWidth * 0.23,
     width: 229,
-    top: 28,
+    top: windowHeight * 0.03,
     height: 48,
     position: "absolute",
   },
 
+  airportCrad1: {
+    left: 0,
+    top: 0,
+  },
   airportCrad2: {
-    top: 118,
+    top: windowHeight * 0.12,
     left: 0,
   },
   airportCrad3: {
-    top: 236,
+    top: windowHeight * 0.24,
     left: 0,
   },
-  reactIconsfafauser: {
-    left: 39,
-    top: 22,
-  },
-  name: {
-    fontFamily: "Overpass-SemiBold",
-    fontWeight: "600",
-    lineHeight: 50,
-    letterSpacing: 0,
-    fontSize: 40,
-    textAlign: "left",
-    color: "#fff",
-    left: 0,
-    top: 0,
-  },
-  nameWrapper: {
-    left: 101,
-    top: 31,
-  },
+
   airportCrad: {
-    top: 381,
-    width: 369,
+    top: windowHeight * 0.21,
+    width: 360,
     height: 340,
     position: "absolute",
     alignContent: "center",
+    justifyContent: "center",
   },
-  frameView: {
-    backgroundColor: "#07363f",
-    borderRadius: 24,
-    left: 0,
-    top: 0,
-  },
-  reactIconsfafaheart: {
-    top: 25,
-    left: 70,
-    width: 57,
-    height: 58,
-    position: "absolute",
-  },
-  reactIconsfafaregwindowmini: {
-    left: 161,
-    width: 22,
-    height: 72,
-  },
-  reactIconsfafamapmarked: {
-    left: 60,
-    width: 71,
-    height: 68,
-  },
-  reactIconsfafawrench: {
-    top: 20,
-    left: 233,
-    width: 55,
-    height: 59,
-    position: "absolute",
-  },
+
   airportCrad4: {
-    top: 360,
+    top: windowHeight * 0.37,
     left: 0,
   },
   airportCrad5: {
-    top: 430,
+    top: windowHeight * 0.45,
     left: 0,
   },
 
   myProfile: {
-    borderRadius: 48,
     backgroundColor: "#070606",
-    shadowColor: "#1f1f23",
-    shadowOffset: {
-      width: 4,
-      height: 10,
-    },
-    shadowRadius: 54,
-    elevation: 54,
-    shadowOpacity: 1,
     flex: 1,
     width: "100%",
     height: "100%",
-    overflow: "hidden",
     alignItems: "center",
   },
 
   hello1: {
-    fontSize: 40,
+    fontSize: windowWidth * 0.095,
     fontFamily: "Poppins-Bold",
     textAlign: "left",
     fontWeight: "700",
-    lineHeight: 54,
     color: "#fff",
     left: 0,
     top: 0,
@@ -958,40 +880,21 @@ const styles = StyleSheet.create({
     position: "relative",
   },
   helloChild: {
-    top: 10,
-    left: 295,
+    top: windowHeight * 0.077,
+    left: windowWidth * 0.69,
     width: 60,
     height: 50,
     position: "absolute",
   },
   hello: {
-    top: 65,
+    top: windowHeight * 0.0,
     width: 400,
     height: 190,
-    left: -15,
+    left: windowWidth * -0.04,
     position: "relative",
-    alignContent: "flex-start",
-    justifyContent: "flex-start",
-    alignItems: "center",
-  },
-  helloLayout2: {
-    height: 100,
-    position: "absolute",
-    alignItems: "center",
     alignContent: "center",
     justifyContent: "center",
-  },
-  helloChild2: {
     alignItems: "center",
-    alignContent: "center",
-    justifyContent: "center",
-    width: 80,
-    top: 120,
-  },
-  hello2: {
-    top: 70,
-    width: 378,
-    left: 30,
   },
 });
 

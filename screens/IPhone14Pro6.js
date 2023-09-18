@@ -20,47 +20,36 @@ const IPhone14Pro = () => {
   const handleStartClick = () => {
     navigation.navigate("signin");
   };
+
   return (
     <ImageBackground
       source={require("../assets/unsplashrajnd0b3hdw.png")}
       style={styles.backgroundImage}
     >
       <View style={styles.iphone14Pro}>
-        <Text style={styles.bonVoyageIn}>TrailBlaze</Text>
-        <Text style={styles.letTheClassicContainer}>
-          <Text style={styles.letTheClassic}>
-            {`Your Personalized Journey Planner`}
-          </Text>
-          <Text style={styles.newAdventures}> – Where Adventure Begins,</Text>
-          <Text style={styles.letTheClassic}> Memories Never End!</Text>
-        </Text>
+        <View style={styles.textContainer}>
+          <Text style={styles.bonVoyageIn}>TrailBlaze</Text>
+          <View style={styles.letTheClassicContainer}>
+            <Text style={styles.letTheClassic}>
+              Your Personalized Journey Planner
+            </Text>
+            <Text style={styles.newAdventures}> – Where Adventure Begins,</Text>
+            <Text style={styles.letTheClassic}> Memories Never End!</Text>
+          </View>
+        </View>
+      </View>
 
-        <View
-          style={[
-            styles.ellipseParent,
-            styles.groupChildLayout,
-            styles.centeredAtBottom,
-          ]}
-        >
+      <View style={styles.container}>
+        <View style={styles.centeredAtBottom}>
           <TouchableOpacity
-            underlayColor="transparent" // This sets the background color when pressed
-            // onPress={() => {
-            //   navigation.navigate("Home");
-            //   // Handle button press here
-            // }}
+            underlayColor="transparent"
             onPress={handleStartClick}
           >
-            <Image
-              style={[styles.groupChild, styles.groupChildLayout]}
-              resizeMode="cover"
-              source={require("../assets/ellipse-2.png")}
-            />
-            <Image
-              style={styles.groupItem}
-              resizeMode="cover"
-              source={require("../assets/ellipse-1.png")}
-            />
-            <Text style={[styles.start, styles.startTypo]}>Start</Text>
+            <View style={styles.circleContainer}>
+              <View style={styles.circle1}></View>
+              <View style={styles.circle2}></View>
+              <Text style={[styles.start, styles.startTypo]}>Start</Text>
+            </View>
           </TouchableOpacity>
         </View>
       </View>
@@ -73,77 +62,91 @@ const styles = StyleSheet.create({
     flex: 1,
     resizeMode: "cover",
   },
-  groupChildPosition: {
-    left: 0,
-    top: 0,
-  },
-  startTypo: {
-    fontSize: 30,
-    position: "absolute",
+
+  container: {
+    flex: 1,
+    textAlign: "center",
+    justifyContent: "center",
+    alignItems: "center",
   },
 
-  unsplashrajnd0b3hdwIcon: {
-    zIndex: -1,
+  textContainer: {
+    alignItems: "flex-start",
+    marginLeft: windowWidth * 0.075,
+    marginTop: windowHeight * 0.15,
   },
   bonVoyageIn: {
-    top: 130,
-    left: 34,
-    fontSize: 62,
+    fontSize: windowWidth * 0.16, // Responsive font size
     fontFamily: "Submaster",
-    width: 340,
-    textAlign: "left",
     color: "white",
-    position: "absolute",
+  },
+  letTheClassicContainer: {
+    marginTop: 10, // Add top margin as needed
   },
   letTheClassic: {
-    fontSize: 17,
+    fontSize: windowWidth * 0.04, // Responsive font size
     fontFamily: "Poppins-Medium",
     color: "white",
   },
   newAdventures: {
-    fontSize: 17,
+    fontSize: windowWidth * 0.04, // Responsive font size
     fontFamily: "Poppins-Medium",
     color: "#fee53f",
   },
-  letTheClassicContainer: {
-    top: 205,
-    left: 34,
-    width: 320,
-    textAlign: "left",
+  unsplashrajnd0b3hdwIcon: {
+    zIndex: -1,
   },
-  groupChild: {
-    opacity: 0.7,
+  centeredAtBottom: {
+    alignItems: "center",
+    justifyContent: "center",
+    position: "absolute",
+    bottom: 0,
     left: 0,
-    top: 0,
+    right: 0,
+    height: "45%",
   },
-  groupChildLayout: {
-    height: 130,
-    width: 130,
+  circleContainer: {
+    flexDirection: "column",
+    alignItems: "center",
+    justifyContent: "center",
+    height: "100%", // Take up the full height of the parent
+  },
+
+  circle1: {
+    width: "55%", // Adjust the percentage width as needed
+    aspectRatio: 1, // Maintain aspect ratio for a circle
+    borderRadius: "75%", // Set a large border radius for a circle
+    backgroundColor: "#EFEFEF",
+  },
+
+  circle2: {
+    width: "45%", // Adjust the width to make it smaller
+    height: "50%",
+    borderRadius: "60%",
+    backgroundColor: "black",
+    marginTop: windowHeight * -0.125, // Adjust this value to center Circle 2
     position: "absolute",
   },
-  groupItem: {
-    top: 10,
-    left: 13,
-    width: 105,
-    height: 105,
-    position: "absolute",
-  },
+
   start: {
-    top: 40,
-    left: 25,
     fontFamily: "Poppins-Medium",
     color: "#fff",
     textAlign: "center",
-    width: 79,
-    height: 38,
+    justifyContent: "center",
+    alignItems: "center",
   },
-  ellipseParent: {
+  startTypo: {
+    fontSize: windowWidth * 0.075, // Responsive font size
     position: "absolute",
+    fontFamily: "Poppins-Medium",
+    color: "#fff",
+    textAlign: "center",
   },
-  centeredAtBottom: {
-    alignItems: "center", // Center horizontally
-    top: windowHeight * 0.85,
-    left: windowWidth * 0.2,
+
+  iphone14Pro: {
+    flex: 1,
+    alignItems: "flex-start",
+    justifyContent: "flex-start",
   },
 });
 

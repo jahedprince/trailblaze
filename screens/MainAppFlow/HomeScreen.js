@@ -8,6 +8,7 @@ import {
   TouchableOpacity,
   Image,
   Keyboard,
+  Dimensions,
   TouchableWithoutFeedback,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
@@ -34,6 +35,9 @@ import {
   deleteDoc,
 } from "firebase/firestore";
 import { useUser } from "../../Providers/UserContext"; // Update the import path to match your project structure
+
+const windowWidth = Dimensions.get("window").width;
+const windowHeight = Dimensions.get("window").height;
 
 const HomeScreen = () => {
   const navigation = useNavigation();
@@ -212,17 +216,17 @@ const styles = StyleSheet.create({
     lineHeight: 30,
     textTransform: "uppercase",
     fontFamily: "Poppins-Medium",
-    left: 10,
+    left: windowWidth * 0.02,
   },
   c60ee25f093d85a18569d288610075Icon: {
     left: 0,
     top: 0,
   },
   hiGif: {
-    left: 300,
+    left: windowWidth * 0.7,
     height: 120,
     width: 120,
-    top: 50,
+    top: windowHeight * 0.06,
     position: "absolute",
   },
   childPosition: {
@@ -248,7 +252,7 @@ const styles = StyleSheet.create({
     lineHeight: 54,
     color: "#fff",
     left: 0,
-    top: 25,
+    top: windowHeight * 0.02,
     position: "absolute",
   },
   hello1Clr2: {
@@ -260,29 +264,27 @@ const styles = StyleSheet.create({
     fontSize: 54,
     fontFamily: "Poppins-Bold",
     textAlign: "left",
-    lineHeight: 62,
     color: "#fff",
     left: 0,
-    top: 75,
+    top: windowHeight * 0.055,
     position: "absolute",
   },
   helloChild: {
-    top: 75,
-    left: 205,
+    top: windowHeight * 0.075,
+    left: windowWidth * 0.5,
     width: 63,
     height: 50,
     position: "absolute",
   },
   hello: {
-    top: 60,
+    top: windowHeight * 0.065,
     width: 220,
-    height: 122,
-    left: 10,
+    left: windowHeight * 0.01,
     position: "absolute",
   },
   itineraryContainer: {
     flex: 1, // Let this container take up all available space
-    top: 200, // Adjust this value as needed
+    top: windowHeight * 0.22, // Adjust this value as needed
     left: 0,
     right: 0,
     bottom: 0, // Ensure it stretches to the bottom
@@ -290,7 +292,7 @@ const styles = StyleSheet.create({
   },
   itineraryList: {
     padding: 15,
-    marginBottom: 65, // Height of the BottomNavigation
+    marginBottom: windowHeight * 0.07, // Height of the BottomNavigation
   },
   navigation: {
     position: "absolute",

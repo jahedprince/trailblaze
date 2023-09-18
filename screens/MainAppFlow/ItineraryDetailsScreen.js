@@ -11,6 +11,7 @@ import {
   Button,
   TouchableWithoutFeedback,
   Keyboard,
+  Dimensions,
 } from "react-native";
 import { initializeApp } from "firebase/app";
 import {
@@ -39,6 +40,9 @@ import Swipeout from "react-native-swipeout";
 import { FontAwesome } from "@expo/vector-icons";
 import { Feather } from "@expo/vector-icons";
 import { Ionicons } from "@expo/vector-icons";
+
+const windowWidth = Dimensions.get("window").width;
+const windowHeight = Dimensions.get("window").height;
 
 const ItineraryDetailsScreen = ({ route }) => {
   const { itinerary } = route.params;
@@ -191,7 +195,7 @@ const ItineraryDetailsScreen = ({ route }) => {
               ),
               backgroundColor: "transparent",
 
-              onPress: () => onDelete(activityIndex), // Call the onDelete function here
+              onPress: () => onDelete(activityIndex),
             },
           ]}
           autoClose={true}
@@ -238,7 +242,7 @@ const ItineraryDetailsScreen = ({ route }) => {
     });
 
     return (
-      <View style={styles.itineraryItem}>
+      <TouchableOpacity activeOpacity={0.8} style={styles.itineraryItem}>
         <LinearGradient
           colors={["rgba(7, 54, 63, 1)", "rgba(10, 46, 53, 1)"]}
           style={styles.linearGradient}
@@ -251,7 +255,7 @@ const ItineraryDetailsScreen = ({ route }) => {
           <TextInput
             style={styles.newActivityInput}
             placeholder="Add a new activity"
-            value={newActivityTexts[index]} // Use the newActivityText for the current day
+            value={newActivityTexts[index]}
             onChangeText={(text) => {
               const updatedTexts = [...newActivityTexts];
               updatedTexts[index] = text;
@@ -259,18 +263,18 @@ const ItineraryDetailsScreen = ({ route }) => {
             }}
           />
           <TouchableOpacity
-            style={styles.addButton} // Define this style in your stylesheet
+            style={styles.addButton}
             onPress={() => addNewActivity(index)}
           >
             {/* <Text style={styles.buttonText}>Add Activity</Text> */}
             <Ionicons
               name="ios-add-circle-outline"
-              size={30}
+              size={31}
               color="rgba(34, 221, 133, 0.8)"
             />
           </TouchableOpacity>
         </LinearGradient>
-      </View>
+      </TouchableOpacity>
     );
   };
 
@@ -285,7 +289,7 @@ const ItineraryDetailsScreen = ({ route }) => {
             <Image
               style={styles.helloChild}
               resizeMode="cover"
-              source={require("../../assets/Frame.png")} // Replace with the actual image path
+              source={require("../../assets/Frame.png")}
             />
           </View>
         </View>
@@ -312,22 +316,21 @@ const ItineraryDetailsScreen = ({ route }) => {
 
 const styles = StyleSheet.create({
   addButton: {
-    backgroundColor: "transparent", // Change to your desired background color
+    backgroundColor: "transparent",
     padding: 10,
     borderRadius: 5,
     alignItems: "center",
     justifyContent: "center",
   },
   buttonText: {
-    color: "rgba(25, 130, 252, 0.8)", // Change to your desired text color
-    fontSize: 19, // Adjust the font size as needed
-
+    color: "rgba(25, 130, 252, 0.8)",
+    fontSize: 19,
     letterSpacing: 0.25,
     lineHeight: 20,
   },
   newActivityInput: {
     fontFamily: "Overpass-SemiBold",
-    fontSize: 20,
+    fontSize: windowWidth * 0.046,
     color: "white",
     textAlign: "center",
     marginBottom: 0,
@@ -364,53 +367,53 @@ const styles = StyleSheet.create({
     textAlign: "left",
   },
   hello1: {
-    fontSize: 40,
+    fontSize: windowWidth * 0.095,
     fontFamily: "Poppins-Bold",
     textAlign: "left",
     fontWeight: "700",
     lineHeight: 54,
     color: "#fff",
-    left: 5,
+    left: windowWidth * 0.01,
     top: 0,
     margin: 5,
     position: "absolute",
   },
   helloChild: {
-    top: 15,
-    left: 335,
+    top: windowHeight * 0.01,
+    left: windowWidth * 0.8,
     width: 60,
     height: 50,
     position: "absolute",
   },
   hello: {
-    top: 65,
+    top: windowHeight * 0.065,
     width: 400,
     height: 190,
-    left: 10,
+    left: windowWidth * 0.01,
     position: "absolute",
   },
   itineraryContainer: {
-    flex: 1, // Let this container take up all available space
-    top: 110, // Adjust this value as needed
+    flex: 1,
+    top: windowHeight * 0.13,
     left: 0,
     right: 0,
-    bottom: 0, // Ensure it stretches to the bottom
+    bottom: 0,
     position: "absolute",
   },
 
   destination: {
     color: "#F7FF88",
-    fontSize: 35,
-    marginTop: 20,
+    fontSize: windowWidth * 0.075,
+    marginTop: 15,
     padding: 0,
     textAlign: "left",
     letterSpacing: 0,
     textTransform: "uppercase",
     fontFamily: "Poppins-Medium",
-    left: 20,
+    left: windowWidth * 0.03,
   },
   duration: {
-    fontSize: 24,
+    fontSize: windowWidth * 0.055,
     fontWeight: "500",
     marginTop: 0,
     marginBottom: 10,
@@ -422,11 +425,11 @@ const styles = StyleSheet.create({
     lineHeight: 30,
     textTransform: "uppercase",
     fontFamily: "Poppins-Medium",
-    left: 20,
+    left: windowWidth * 0.03,
   },
   itineraryList: {
     padding: 15,
-    marginBottom: 65, // Height of the BottomNavigation
+    marginBottom: 65,
   },
   navigation: {
     position: "absolute",
@@ -434,11 +437,7 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
   },
-  // iconAndHeader: {
-  //   flexDirection: "row", // Arrange items horizontally
-  //   alignItems: "center", // Align items vertically in the center
-  //   marginBottom: 10, // Add margin as needed
-  // },
+
   itineraryItem: {
     marginBottom: 15,
     borderRadius: 30,
@@ -451,7 +450,7 @@ const styles = StyleSheet.create({
     paddingRight: 20,
   },
   header: {
-    fontSize: 31,
+    fontSize: windowWidth * 0.07,
     fontWeight: "700",
     fontFamily: "Overpass-Bold",
     marginTop: 10,
@@ -465,7 +464,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   viewDetails: {
-    fontSize: 20,
+    fontSize: windowWidth * 0.06,
     fontWeight: "bold",
     color: "rgba(255, 255, 255, 0.5)",
     textAlign: "center",
@@ -474,9 +473,9 @@ const styles = StyleSheet.create({
   },
   itineraryDetails: {
     fontFamily: "Overpass-SemiBold",
-    fontSize: 21,
+    fontSize: windowWidth * 0.05,
     color: "white",
-    textAlign: "center", // Add this line to center-align the text
+    textAlign: "center",
   },
 });
 

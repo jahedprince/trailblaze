@@ -23,14 +23,8 @@ const SignUp = () => {
         source={require("../assets/cover.png")}
         style={styles.backgroundImage}
       >
-        <View style={styles.iphone14Pro}>
-          <View
-            style={[
-              styles.ellipseParent,
-              styles.groupChildLayout,
-              styles.centeredAtBottom,
-            ]}
-          >
+        <View style={styles.container}>
+          <View style={[styles.ellipseParent, styles.centeredAtBottom]}>
             <SignupComponent />
           </View>
         </View>
@@ -47,18 +41,18 @@ const styles = StyleSheet.create({
   unsplashrajnd0b3hdwIcon: {
     zIndex: -1,
   },
-  groupChild: {
-    opacity: 0.7,
-    left: 0,
-    top: 0,
+  container: {
+    flex: 1,
+    textAlign: "center",
+    justifyContent: "center",
+    alignItems: "center",
   },
   ellipseParent: {
     position: "absolute",
   },
   centeredAtBottom: {
     alignItems: "center",
-    top: windowHeight * 0.3,
-    left: windowWidth * 0.125,
+    justifyContent: "center",
   },
 });
 

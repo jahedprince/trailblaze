@@ -11,6 +11,7 @@ import {
   Alert,
   Platform,
   Keyboard,
+  Dimensions,
 } from "react-native";
 import axios from "axios"; // Import axios or use fetch
 import {
@@ -44,6 +45,9 @@ import {
 } from "@env";
 import { getAuth } from "firebase/auth";
 import { useUser } from "../../Providers/UserContext";
+
+const windowWidth = Dimensions.get("window").width;
+const windowHeight = Dimensions.get("window").height;
 
 /* eslint-disable prettier/prettier */
 
@@ -362,7 +366,7 @@ const styles = StyleSheet.create({
   backgroundContainer: {
     flex: 0.18,
     alignContent: "center",
-    left: 60,
+    left: windowWidth * 0.16,
   },
 
   hello1Clr: {
@@ -370,26 +374,25 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   hello1: {
-    fontSize: 40,
+    fontSize: windowWidth * 0.095,
     fontFamily: "Poppins-Bold",
     textAlign: "center",
     fontWeight: "700",
     lineHeight: 54,
     color: "#fff",
-    left: 5,
     top: 0,
     margin: 5,
     position: "absolute",
   },
   helloChild: {
-    top: 15,
-    left: 250,
+    top: windowHeight * 0.015,
+    left: windowWidth * 0.565,
     width: 60,
     height: 50,
     position: "absolute",
   },
   hello: {
-    top: 65,
+    top: windowHeight * 0.065,
     width: 400,
     height: 190,
     left: 0,

@@ -3,12 +3,8 @@ import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { getFirestore } from "firebase/firestore";
 import React from "react";
 import { getAuth } from "firebase/auth";
-
-// import * as React from "react";
-
 import { useFonts } from "expo-font";
 import { View, Text, Pressable, TouchableOpacity } from "react-native";
-
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 import { Provider } from "react-redux";
@@ -42,15 +38,10 @@ const firebaseConfig = {
   messagingSenderId: FIREBASE_MESSAGING_SENDER_ID,
   appId: FIREBASE_APP_ID,
 };
-
 const app = initializeApp(firebaseConfig);
-
 const auth = getAuth(app);
-
 const db = getFirestore(app);
-
 const Stack = createStackNavigator();
-
 const store = createStore(rootReducer, applyMiddleware(thunk));
 
 const App = () => {
@@ -70,8 +61,6 @@ const App = () => {
   if (!fontsLoaded && !error) {
     return null;
   }
-
-  // screenOptions={{ headerShown: false }}
 
   return (
     <Provider store={store}>

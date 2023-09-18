@@ -5,7 +5,7 @@ const createTravelItinerary = async (destination, duration, apiKey) => {
     const response = await axios.post(
       "https://api.openai.com/v1/engines/text-davinci-003/completions",
       {
-        prompt: `give me a travel itinerary for ${destination} for ${duration} days`,
+        prompt: `give me a detailed travel itinerary with multiple activities for each day from morning, afternoon, evening and night to ${destination} for ${duration} days`,
         max_tokens: 1200,
         temperature: 0.2,
         n: 1,
