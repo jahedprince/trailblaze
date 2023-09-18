@@ -1,14 +1,14 @@
 # TrailBlaze - Your Ultimate Travel Itinerary App
 
-<img src="./assets/trailblaze-logo.png" alt="App Icon" width="100" height="100">
+<div align="center">
+    <img src="./assets/trailblaze-logo.png" alt="App Icon" width="100" height="100">
+</div>
 
 Welcome to TrailBlaze, your go-to app for planning and organizing travel adventures!
 
 ## Download on the App Store
 
 TrailBlaze is available for download on the Apple App Store. Get it now to start planning your next adventure!
-
-[Link to the App Store]
 
 ## Table of Contents
 
