@@ -1,8 +1,14 @@
 # TrailBlaze - Your Ultimate Travel Itinerary App
 
-![App Icon](./assets/trailblaze-logo.png)
+<img src="./assets/trailblaze-logo.png" alt="App Icon" width="100" height="100">
 
 Welcome to TrailBlaze, your go-to app for planning and organizing travel adventures!
+
+## Download on the App Store
+
+TrailBlaze is available for download on the Apple App Store. Get it now to start planning your next adventure!
+
+[Link to the App Store]
 
 ## Table of Contents
 
@@ -10,8 +16,6 @@ Welcome to TrailBlaze, your go-to app for planning and organizing travel adventu
 - [Technologies](#technologies)
 - [Screenshots](#screenshots)
 - [Getting Started](#getting-started)
-- [Installation](#installation)
-- [Usage](#usage)
 - [Feedback](#feedback)
 - [Privacy Policy](#privacy-policy)
 - [License](#license)
@@ -31,26 +35,27 @@ Welcome to TrailBlaze, your go-to app for planning and organizing travel adventu
 
 ## Screenshots
 
-![Screenshot 1](link-to-your-screenshot1.png)
-_Caption for Screenshot 1_
+![Screenshot 1](./assets/screenshots/landing.png)
+Landing Page
 
-![Screenshot 2](link-to-your-screenshot2.png)
-_Caption for Screenshot 2_
+![Screenshot 2](./assets/screenshots/home.png)
+HomeScreen
+
+![Screenshot 3](./assets/screenshots/chat.png)
+ChatScreen
+
+![Screenshot 4](./assets/screenshots/details.png)
+Itinerary Details
 
 ## Getting Started
 
 To get started with TrailBlaze, follow these steps:
 
-### Installation
-
-1. Clone the repository: `git clone https://github.com/your-username/TrailBlaze.git`
-2. Install dependencies: `npm install`
-
-### Usage
-
-1. Run the app: `npm start`
-2. Open the Expo Go app on your device.
-3. Scan the QR code to launch TrailBlaze on your mobile device.
+1. Create an Account: Begin by downloading the app from the App Store. Sign up for your personalized account to get started.
+2. Start a New Trip: To kick off your journey, simply tap the "+" button located at the bottom of your screen. Follow the prompts to enter your destination and travel duration. You can choose to save the itinerary for later or dive right into planning.
+3. Add Activities: Enhance your itinerary by clicking the "+" button while viewing your trip plan. Feel free to include your own unique ideas and preferences.
+4. Customize: Tailor your adventure to perfection by fine-tuning the AI-generated activities. Make it uniquely yours.
+5. Enjoy Your Trip: Follow your meticulously crafted itinerary, embark on exciting explorations, and savor every moment of your travel experience!
 
 ## Feedback
 
