@@ -35,16 +35,16 @@ TrailBlaze is available for download on the Apple App Store. Get it now to start
 
 ## Screenshots
 
-![Screenshot 1](./assets/screenshots/landing.png)
+<img src="./assets/screenshots/landing.png" alt="Landing Scree" width="400" height="500">
 Landing Page
 
-![Screenshot 2](./assets/screenshots/home.png)
-HomeScreen
+<img src="./assets/screenshots/home.png" alt="Home Screen" width="400" height="500">
+Home Screen
 
-![Screenshot 3](./assets/screenshots/chat.png)
-ChatScreen
+<img src="./assets/screenshots/chat.png" alt="Chat Screen" width="400" height="500">
+Chat Screen
 
-![Screenshot 4](./assets/screenshots/details.png)
+<img src="./assets/screenshots/details.png" alt="Itinerary Details" width="400" height="500">
 Itinerary Details
 
 ## Getting Started
