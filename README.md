@@ -1,6 +1,6 @@
 # TrailBlaze - Your Ultimate Travel Itinerary App
 
-![App Icon](link-to-your-icon-image.png)
+![App Icon](./assets/trailblaze-logo.png)
 
 Welcome to TrailBlaze, your go-to app for planning and organizing travel adventures!
 
