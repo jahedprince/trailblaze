@@ -121,7 +121,7 @@ const styles = StyleSheet.create({
 
   circle2: {
     width: "45%", // Adjust the width to make it smaller
-    height: "50%",
+    height: "57%",
     borderRadius: "60%",
     backgroundColor: "black",
     marginTop: windowHeight * -0.125, // Adjust this value to center Circle 2
