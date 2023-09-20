@@ -64,4 +64,6 @@ Before using TrailBlaze, please review our [Privacy Policy](https://www.privacyp
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details.
+All Rights Reserved. This project is protected by copyright law and may not be used, modified, or distributed without express permission from the author - see the [LICENSE.txt](LICENSE.txt) file for details.
+
+© [Jahed Prince]
