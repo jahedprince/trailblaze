@@ -237,6 +237,11 @@ const MyProfile = () => {
     try {
       const user = auth.currentUser;
 
+      if (!user) {
+        console.error("User is not authenticated.");
+        return;
+      }
+
       // Ask for permission to access the device's photo library
       const { status } =
         await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -250,24 +255,30 @@ const MyProfile = () => {
         mediaTypes: ImagePicker.MediaTypeOptions.Images,
         allowsEditing: true,
         aspect: [1, 1],
-        quality: 1, // Image quality (0 to 1)
+        quality: 1,
       });
 
       if (!result.cancelled) {
-        // Upload the selected image to Firebase Storage
-        const response = await fetch(result.uri);
-        const blob = await response.blob();
-        const fileName = `${user.uid}_${Date.now()}.jpg`; // Generate a unique filename
-        const storageRef = ref(storage, `profilePictures/${fileName}`);
+        // Create a subfolder based on the user's UID
+        const userId = user.uid;
+        const fileName = `${userId}_${Date.now()}.jpg`;
+        const storageRef = ref(
+          storage,
+          `profilePictures/${userId}/${fileName}`
+        );
 
         // Upload the image
+        const response = await fetch(result.uri);
+        const blob = await response.blob();
+
+        // Upload the image to the subfolder
         const snapshot = await uploadBytesResumable(storageRef, blob);
 
         // Get the download URL of the uploaded image
         const downloadURL = await getDownloadURL(snapshot.ref);
 
         // Update the profile picture URL in Firestore
-        const userDocRef = doc(db, "users", user.uid);
+        const userDocRef = doc(db, "users", userId);
         await updateDoc(userDocRef, {
           profilePictureUrl: downloadURL,
         });
@@ -294,13 +305,36 @@ const MyProfile = () => {
       // Get the UID of the authenticated user
       const userId = user.uid;
 
+      // Retrieve the current profile picture URL from Firestore
+      const userDocRef = doc(db, "users", userId);
+      const userDocSnap = await getDoc(userDocRef);
+
+      if (!userDocSnap.exists()) {
+        console.error("User document does not exist in Firestore");
+        return;
+      }
+
+      const userData = userDocSnap.data();
+      const profilePictureUrl = userData.profilePictureUrl;
+
+      if (!profilePictureUrl) {
+        console.error("No profile picture to delete");
+        return;
+      }
+
+      // Extract the timestamp from the URL (assuming it's part of the filename)
+      const fileNameParts = profilePictureUrl.split("/");
+      const fileName = fileNameParts[fileNameParts.length - 1];
+      const timestamp = fileName.split("_")[1].split(".")[0];
+
+      // Construct the correct storage path
+      const storagePath = `profilePictures/${userId}/${userId}_${timestamp}.jpg`;
+
       // Delete the profile picture file from Firebase Storage
-      const fileName = profilePictureUrl.split("/").pop();
-      const storageRef = ref(storage, `profilePictures/${userId}/${fileName}`);
+      const storageRef = ref(storage, storagePath);
       await deleteObject(storageRef);
 
       // Update the profile picture URL in Firestore to null
-      const userDocRef = doc(db, "users", userId);
       await updateDoc(userDocRef, {
         profilePictureUrl: null,
       });
@@ -385,12 +419,16 @@ const MyProfile = () => {
         <TouchableOpacity onPress={toggleImageModal}>
           <TouchableOpacity onPress={toggleImageModal} style={styles.pfp}>
             {profilePictureUrl ? (
-              <Image source={{ uri: profilePictureUrl }} style={styles.pfp1} />
+              <Image
+                source={{ uri: profilePictureUrl }}
+                style={styles.pfp1}
+                onPress={toggleImageModal}
+              />
             ) : (
               <Entypo
                 style={styles.pfp1}
                 name="user"
-                size={100}
+                size={130}
                 color="white"
               />
             )}
@@ -503,7 +541,7 @@ const MyProfile = () => {
                   style={styles.modalInput}
                   value={email}
                   onChangeText={(text) => setEmail(text)}
-                  placeholder={email}
+                  placeholder="Enter new email"
                 />
                 <TouchableOpacity onPress={() => updateUserEmail(email)}>
                   <Text style={styles.saveButton}>Save</Text>
@@ -656,8 +694,8 @@ const styles = StyleSheet.create({
     marginBottom: 5,
   },
   pfp1: {
-    width: 200,
-    height: 200,
+    width: 130,
+    height: 130,
   },
   modalContainer: {
     flex: 1,
@@ -789,8 +827,10 @@ const styles = StyleSheet.create({
 
   //pfp
   pfp: {
-    top: windowHeight * -0.03,
-    left: windowWidth * 0.12,
+    top: windowHeight * -0.04,
+    // left: windowWidth * 0.1,
+    justifyContent: "center",
+    alignItems: "center",
   },
 
   airportCradChild: {

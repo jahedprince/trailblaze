@@ -271,7 +271,7 @@ const styles = StyleSheet.create({
   },
   helloChild: {
     top: windowHeight * 0.075,
-    left: windowWidth * 0.5,
+    left: windowWidth * 0.51,
     width: 63,
     height: 50,
     position: "absolute",
@@ -279,7 +279,7 @@ const styles = StyleSheet.create({
   hello: {
     top: windowHeight * 0.065,
     width: 220,
-    left: windowHeight * 0.01,
+    left: windowHeight * 0.015,
     position: "absolute",
   },
   itineraryContainer: {

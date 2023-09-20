@@ -113,7 +113,7 @@ const styles = StyleSheet.create({
   },
 
   circle1: {
-    width: "55%", // Adjust the percentage width as needed
+    width: "54%", // Adjust the percentage width as needed
     aspectRatio: 1, // Maintain aspect ratio for a circle
     borderRadius: "75%", // Set a large border radius for a circle
     backgroundColor: "#EFEFEF",
@@ -121,7 +121,7 @@ const styles = StyleSheet.create({
 
   circle2: {
     width: "45%", // Adjust the width to make it smaller
-    height: "57%",
+    height: "52%",
     borderRadius: "60%",
     backgroundColor: "black",
     marginTop: windowHeight * -0.125, // Adjust this value to center Circle 2
