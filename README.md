@@ -8,7 +8,7 @@ Welcome to TrailBlaze, your go-to app for planning and organizing travel adventu
 
 ## Download on the App Store
 
-TrailBlaze is available for download on the Apple [App Store] (https://apps.apple.com/us/app/trail-blaze/id6466730487) . Get it now to start planning your next adventure!
+TrailBlaze is available for download on the Apple [App Store](https://apps.apple.com/us/app/trail-blaze/id6466730487). Get it now to start planning your next adventure!
 
 ## Table of Contents
 
