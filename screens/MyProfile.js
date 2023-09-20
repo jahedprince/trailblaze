@@ -9,6 +9,7 @@ import {
   TextInput,
   ImagePickerIOS,
   Dimensions,
+  ActivityIndicator,
 } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 import { FontAwesome } from "@expo/vector-icons";
@@ -78,6 +79,8 @@ const MyProfile = () => {
   const [isDeleteModalVisible, setDeleteModalVisible] = useState(false);
   const [deleteError, setDeleteError] = useState(""); // State to store deletion error messages
 
+  const [isLoadingImage, setLoadingImage] = useState(true);
+
   const auth = getAuth();
   const db = getFirestore();
   const storage = getStorage();
@@ -100,12 +103,22 @@ const MyProfile = () => {
             setName(userName);
             const userProfilePicUrl = userData.profilePictureUrl || null;
             setProfilePictureUrl(userProfilePicUrl);
+
+            // Preload the profile picture (if available)
+            if (userProfilePicUrl) {
+              await Image.prefetch(userProfilePicUrl); // Wait for the image to prefetch
+              setLoadingImage(false); // Set isLoadingImage to false when image is loaded
+            } else {
+              setLoadingImage(false); // Set isLoadingImage to false when no image is available
+            }
           } else {
             console.error("User document does not exist in Firestore");
+            setLoadingImage(false); // Set isLoadingImage to false on error
           }
         }
       } catch (error) {
         console.error("Error fetching user data:", error);
+        setLoadingImage(false); // Set isLoadingImage to false on error
       }
     };
 
@@ -242,11 +255,15 @@ const MyProfile = () => {
         return;
       }
 
+      // Set isLoadingImage to true while the new image is being uploaded
+      setLoadingImage(true);
+
       // Ask for permission to access the device's photo library
       const { status } =
         await ImagePicker.requestMediaLibraryPermissionsAsync();
       if (status !== "granted") {
         alert("Permission to access photos was denied");
+        setLoadingImage(false); // Set isLoadingImage to false on permission denied
         return;
       }
 
@@ -285,9 +302,16 @@ const MyProfile = () => {
 
         // Set the profile picture URL in the component state
         setProfilePictureUrl(downloadURL);
+
+        // Set isLoadingImage to false once the image is successfully uploaded
+        setLoadingImage(false);
+      } else {
+        // Set isLoadingImage to false if the user cancels the image upload
+        setLoadingImage(false);
       }
     } catch (error) {
       console.error("Error selecting/uploading profile picture:", error);
+      setLoadingImage(false); // Set isLoadingImage to false on error
       // Handle errors, e.g., show an error message to the user
     }
   };
@@ -417,12 +441,14 @@ const MyProfile = () => {
         </View>
 
         <TouchableOpacity onPress={toggleImageModal}>
-          <TouchableOpacity onPress={toggleImageModal} style={styles.pfp}>
-            {profilePictureUrl ? (
+          <TouchableOpacity style={styles.pfp} onPress={toggleImageModal}>
+            {isLoadingImage ? ( // Display the loading indicator while fetching
+              <ActivityIndicator size="large" color="#fff" />
+            ) : profilePictureUrl ? (
               <Image
                 source={{ uri: profilePictureUrl }}
                 style={styles.pfp1}
-                onPress={toggleImageModal}
+                resizeMode="cover"
               />
             ) : (
               <Entypo
@@ -696,6 +722,9 @@ const styles = StyleSheet.create({
   pfp1: {
     width: 130,
     height: 130,
+    borderWidth: 2,
+    borderColor: "#ffffff",
+    borderRadius: 75,
   },
   modalContainer: {
     flex: 1,
