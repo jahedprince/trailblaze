@@ -8,6 +8,7 @@ import {
   TextInput,
   TouchableWithoutFeedback,
   Keyboard,
+  Dimensions,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import firebase from "firebase/app";
@@ -86,6 +87,9 @@ const fetchUserItinerariesFromFirestore = async (userUid) => {
     throw error;
   }
 };
+
+const windowWidth = Dimensions.get("window").width;
+const windowHeight = Dimensions.get("window").height;
 
 const LoginComponent = () => {
   const navigation = useNavigation();
@@ -254,22 +258,21 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     backgroundColor: "white",
-    borderRadius: 24,
-    paddingBottom: 10,
-    width: 320,
-    height: 370,
+    borderRadius: windowWidth * 0.05,
+    width: windowWidth * 0.78,
+    height: windowHeight * 0.45,
+    padding: 10,
   },
   backgroundOverlay: {
     position: "absolute",
     backgroundColor: "rgba(7, 54, 63, 0.8)",
-    borderRadius: 24,
-    width: 370,
-    height: 430,
+    borderRadius: windowWidth * 0.05,
+    width: windowWidth * 0.89,
+    height: windowHeight * 0.5,
   },
   loginTitle: {
     fontFamily: "Poppins-Bold",
-    fontSize: 32,
-    lineHeight: 48,
+    fontSize: windowWidth * 0.075,
     color: "#f7ff88",
     marginTop: 20,
     textTransform: "uppercase",
@@ -278,28 +281,33 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     marginTop: 10,
-    width: 230,
+    textAlign: "center",
+    justifyContent: "center",
   },
   dontHaveAccountText: {
     fontFamily: "Poppins-Medium",
     color: "rgba(255, 255, 255, 1)",
+    fontSize: windowWidth * 0.035,
   },
   signUp: {
     fontFamily: "Poppins-Medium",
     color: "#00a3ff",
     marginLeft: 5,
+    fontSize: windowWidth * 0.035,
   },
   inputContainer: {
     flexDirection: "row",
     alignItems: "center",
     marginTop: 20,
-    width: 300,
+    width: windowWidth * 0.7,
+    textAlign: "center",
+    justifyContent: "center",
   },
   inputIcon: {
     backgroundColor: "#091C20",
     borderRadius: 24,
-    width: 300,
-    height: 40,
+    width: windowWidth * 0.7,
+    height: windowWidth * 0.1,
     justifyContent: "flex-start",
     alignItems: "center",
     flexDirection: "row",
@@ -312,32 +320,24 @@ const styles = StyleSheet.create({
     fontFamily: "Poppins-Medium",
     color: "#848484",
     marginLeft: 10,
-    fontSize: 18,
-    width: 245,
+    fontSize: windowWidth * 0.045,
+    width: windowWidth * 0.56,
   },
-  inputLabel1: {
-    fontFamily: "Poppins-Medium",
-    color: "#848484",
-    marginLeft: 5,
-    fontSize: 18,
-    width: 295,
-  },
+
   loginButtonContainer: {
     backgroundColor: "#00a3ff",
     borderRadius: 24,
-    width: 280,
-    height: 40,
+    width: windowWidth * 0.7,
+    height: windowWidth * 0.09,
     marginTop: 20,
     marginBottom: 10,
     justifyContent: "center",
     alignItems: "center",
-    marginLeft: 20,
-    marginRight: 20,
   },
   loginButton: {
     fontFamily: "Poppins-Medium",
     color: "#fff",
-    fontSize: 20,
+    fontSize: windowWidth * 0.05,
     fontWeight: "500",
     textTransform: "uppercase",
     letterSpacing: 1,
@@ -349,9 +349,11 @@ const styles = StyleSheet.create({
     fontFamily: "Poppins-Medium",
     color: "#FD5D5D",
     marginTop: 10,
-    fontSize: 15,
+    fontSize: windowWidth * 0.035,
     textDecorationLine: "underline",
     textAlign: "center",
+    justifyContent: "center",
+    alignItems: "center",
   },
 });
 

@@ -12,7 +12,7 @@
       "backgroundColor": "#ffffff"
     },
     "platforms": ["ios", "android"],
-    "supportsTablet": false,
+
     "assetBundlePatterns": ["**/*"],
     "ios": {
       "supportsTablet": false,

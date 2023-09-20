@@ -48,7 +48,7 @@ const IPhone14Pro = () => {
             <View style={styles.circleContainer}>
               <View style={styles.circle1}></View>
               <View style={styles.circle2}></View>
-              <Text style={[styles.start, styles.startTypo]}>Start</Text>
+              <Text style={[styles.start, styles.startTypo]}>START</Text>
             </View>
           </TouchableOpacity>
         </View>
@@ -103,7 +103,7 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     right: 0,
-    height: "45%",
+    height: windowHeight * 0.19,
   },
   circleContainer: {
     flexDirection: "column",
@@ -113,18 +113,18 @@ const styles = StyleSheet.create({
   },
 
   circle1: {
-    width: "54%", // Adjust the percentage width as needed
-    aspectRatio: 1, // Maintain aspect ratio for a circle
-    borderRadius: "75%", // Set a large border radius for a circle
-    backgroundColor: "#EFEFEF",
+    width: windowWidth * 0.3,
+    aspectRatio: 1,
+    borderRadius: windowWidth * 0.16,
+    backgroundColor: "#dbd9d9",
   },
 
   circle2: {
-    width: "45%", // Adjust the width to make it smaller
-    height: "52%",
-    borderRadius: "60%",
+    width: windowWidth * 0.25,
+    aspectRatio: 1,
+    borderRadius: windowWidth * 0.16,
     backgroundColor: "black",
-    marginTop: windowHeight * -0.125, // Adjust this value to center Circle 2
+    marginTop: windowHeight * -0.06,
     position: "absolute",
   },
 
@@ -136,7 +136,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   startTypo: {
-    fontSize: windowWidth * 0.075, // Responsive font size
+    fontSize: windowWidth * 0.073, // Responsive font size
     position: "absolute",
     fontFamily: "Poppins-Medium",
     color: "#fff",

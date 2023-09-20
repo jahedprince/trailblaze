@@ -52,6 +52,7 @@ import BottomNavigation from "../components/BottomNavigation";
 import { useNavigation } from "@react-navigation/native";
 import * as ImagePicker from "expo-image-picker";
 import { uploadBytesResumable } from "firebase/storage";
+import { width } from "deprecated-react-native-prop-types/DeprecatedImagePropType";
 
 const windowWidth = Dimensions.get("window").width;
 const windowHeight = Dimensions.get("window").height;
@@ -430,36 +431,157 @@ const MyProfile = () => {
 
   return (
     <View style={styles.container}>
-      <View style={styles.myProfile}>
-        <View style={styles.hello}>
-          <Text style={styles.hello1}>My Profile</Text>
-          <Image
-            style={styles.helloChild}
-            resizeMode="cover"
-            source={require("../assets/Frame.png")}
-          />
+      <View style={styles.main}>
+        <View style={styles.centeredContainer}>
+          <View style={styles.hello}>
+            <Text style={styles.hello1}>My Profile</Text>
+            <Image
+              style={styles.helloChild}
+              resizeMode="cover"
+              source={require("../assets/Frame.png")}
+            />
+          </View>
         </View>
 
-        <TouchableOpacity onPress={toggleImageModal}>
-          <TouchableOpacity style={styles.pfp} onPress={toggleImageModal}>
-            {isLoadingImage ? ( // Display the loading indicator while fetching
-              <ActivityIndicator size="large" color="#fff" />
-            ) : profilePictureUrl ? (
-              <Image
-                source={{ uri: profilePictureUrl }}
-                style={styles.pfp1}
-                resizeMode="cover"
+        <View style={styles.profileContainer}>
+          <View style={styles.profileInfo}>
+            <TouchableOpacity
+              style={styles.profileImageContainer}
+              onPress={toggleImageModal}
+            >
+              {isLoadingImage ? ( // Display the loading indicator while fetching
+                <ActivityIndicator size="large" color="#fff" />
+              ) : profilePictureUrl ? (
+                <Image
+                  source={{ uri: profilePictureUrl }}
+                  resizeMode="cover"
+                  style={styles.profileImage}
+                />
+              ) : (
+                <Entypo
+                  style={styles.profileImage}
+                  name="user"
+                  size={130}
+                  color="white"
+                />
+              )}
+            </TouchableOpacity>
+
+            <Text style={styles.nameText}>Hi, {name}!</Text>
+            <Text style={styles.exploreText}>Let’s Explore the World.</Text>
+          </View>
+          <View style={styles.iconsContainer}>
+            <TouchableOpacity
+              style={styles.iconButton}
+              onPress={toggleNameModal}
+            >
+              <View style={styles.iconBackground}>
+                <FontAwesome name="user" size={40} color="#6C6C6C" />
+              </View>
+              <Text style={styles.iconText}>NAME</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.iconButton}
+              onPress={toggleEmailModal}
+            >
+              <View style={styles.iconBackground}>
+                <MaterialIcons name="email" size={40} color="#6C6C6C" />
+              </View>
+              <Text style={styles.iconText}>EMAIL</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.iconButton}
+              onPress={togglePasswordModal}
+            >
+              <View style={styles.iconBackground}>
+                <Ionicons name="key" size={40} color="#6C6C6C" />
+              </View>
+              <Text style={styles.iconText}>PASSWORD</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.iconButton1} onPress={handleLogout}>
+              <Text style={styles.iconTextWhite}>LOGOUT</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.iconButton2}
+              onPress={toggleDeleteModal}
+            >
+              <Text style={styles.iconTextWhite}>DELETE ACCOUNT</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+
+        <Modal
+          visible={isEmailModalVisible}
+          animationType="slide"
+          transparent={true}
+        >
+          <View style={styles.modalContainer}>
+            <View style={styles.modalContent}>
+              <Text style={styles.modalTitle}>Edit Email</Text>
+              <TextInput
+                style={styles.modalInput}
+                value={email}
+                onChangeText={(text) => setEmail(text)}
+                placeholder="Enter new email"
               />
-            ) : (
-              <Entypo
-                style={styles.pfp1}
-                name="user"
-                size={130}
-                color="white"
+              <TouchableOpacity onPress={() => updateUserEmail(email)}>
+                <Text style={styles.saveButton}>Save</Text>
+              </TouchableOpacity>
+              <TouchableOpacity onPress={toggleEmailModal}>
+                <Text style={styles.cancelButton}>Cancel</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </Modal>
+
+        <Modal
+          visible={isPasswordModalVisible}
+          animationType="slide"
+          transparent={true}
+        >
+          <View style={styles.modalContainer}>
+            <View style={styles.modalContent}>
+              <Text style={styles.modalTitle}>Change Password</Text>
+              <TextInput
+                style={styles.modalInput}
+                value={password}
+                onChangeText={(text) => setPassword(text)}
+                placeholder="Enter new password"
+                secureTextEntry={true} // This hides the entered password
               />
-            )}
-          </TouchableOpacity>
-        </TouchableOpacity>
+              <TouchableOpacity onPress={() => updateUserPassword(password)}>
+                <Text style={styles.saveButton}>Save</Text>
+              </TouchableOpacity>
+              <TouchableOpacity onPress={togglePasswordModal}>
+                <Text style={styles.cancelButton}>Cancel</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </Modal>
+
+        <Modal
+          visible={isNameModalVisible}
+          animationType="slide"
+          transparent={true}
+        >
+          <View style={styles.modalContainer}>
+            <View style={styles.modalContent}>
+              <Text style={styles.modalTitle}>Edit Name</Text>
+              <TextInput
+                style={styles.modalInput}
+                value={newName} // Use newName state for the value
+                onChangeText={(text) => setNewName(text)} // Update newName state
+                placeholder="Enter new name"
+              />
+              <TouchableOpacity onPress={() => handleNameChange(name)}>
+                <Text style={styles.saveButton}>Save</Text>
+              </TouchableOpacity>
+              <TouchableOpacity onPress={toggleNameModal}>
+                <Text style={styles.cancelButton}>Cancel</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </Modal>
 
         <Modal
           visible={isImageModalVisible}
@@ -482,202 +604,174 @@ const MyProfile = () => {
           </View>
         </Modal>
 
-        <Text
-          style={[
-            styles.hiJahedPrince1,
-            styles.hiJahedPrince1Typo,
-            isLongName && { fontSize: 20 },
-            isLongLongName && { fontSize: 17 },
-          ]}
+        <Modal
+          visible={isDeleteModalVisible}
+          animationType="slide"
+          transparent={true}
         >
-          Hi, {name}!
-        </Text>
-        <Text style={[styles.letsExploreThe1, styles.hiJahedPrince1Typo]}>
-          Let’s Explore the World.
-        </Text>
-
-        <View style={styles.airportCrad}>
-          <TouchableOpacity onPress={toggleNameModal}>
-            <TouchableOpacity
-              onPress={toggleNameModal}
-              style={[styles.airportCrad1, styles.airportLayout]}
-            >
-              <View
-                style={[styles.airportCradChild, styles.frameViewPosition]}
+          <View style={styles.modalContainer}>
+            <View style={styles.modalContent}>
+              <Text style={styles.modalTitle}>Confirm Deletion</Text>
+              <Text>Please enter your password to confirm:</Text>
+              <TextInput
+                style={styles.passwordInput}
+                secureTextEntry={true}
+                placeholder="Password"
+                value={password}
+                onChangeText={(text) => setPassword(text)}
               />
-              <FontAwesome
-                style={[styles.reactIconsfafauser]}
-                name="user"
-                size={50}
-                color="#6C6C6C"
-              />
-              <Text style={[styles.email, styles.nameTypo]}>NAME</Text>
-            </TouchableOpacity>
-          </TouchableOpacity>
-          <Modal
-            visible={isNameModalVisible}
-            animationType="slide"
-            transparent={true}
-          >
-            <View style={styles.modalContainer}>
-              <View style={styles.modalContent}>
-                <Text style={styles.modalTitle}>Edit Name</Text>
-                <TextInput
-                  style={styles.modalInput}
-                  value={newName} // Use newName state for the value
-                  onChangeText={(text) => setNewName(text)} // Update newName state
-                  placeholder="Enter new name"
-                />
-                <TouchableOpacity onPress={() => handleNameChange(name)}>
-                  <Text style={styles.saveButton}>Save</Text>
-                </TouchableOpacity>
-                <TouchableOpacity onPress={toggleNameModal}>
-                  <Text style={styles.cancelButton}>Cancel</Text>
-                </TouchableOpacity>
-              </View>
+              <Text style={styles.errorText}>{deleteError}</Text>
+              <TouchableOpacity onPress={handleDeleteAccount}>
+                <Text style={styles.confirmButton}>Confirm</Text>
+              </TouchableOpacity>
+              <TouchableOpacity onPress={toggleDeleteModal}>
+                <Text style={styles.cancelButton}>Cancel</Text>
+              </TouchableOpacity>
             </View>
-          </Modal>
-          <TouchableOpacity onPress={toggleEmailModal}>
-            <TouchableOpacity
-              onPress={toggleEmailModal}
-              style={[styles.airportCrad2, styles.airportLayout]}
-            >
-              <View
-                style={[styles.airportCradChild, styles.frameViewPosition]}
-              />
-              <MaterialIcons
-                style={[styles.reactIconsfafaenvelope]}
-                name="email"
-                size={50}
-                color="#6C6C6C"
-              />
-              <Text style={[styles.email, styles.nameTypo]}>EMAIL</Text>
-            </TouchableOpacity>
-          </TouchableOpacity>
-
-          <Modal
-            visible={isEmailModalVisible}
-            animationType="slide"
-            transparent={true}
-          >
-            <View style={styles.modalContainer}>
-              <View style={styles.modalContent}>
-                <Text style={styles.modalTitle}>Edit Email</Text>
-                <TextInput
-                  style={styles.modalInput}
-                  value={email}
-                  onChangeText={(text) => setEmail(text)}
-                  placeholder="Enter new email"
-                />
-                <TouchableOpacity onPress={() => updateUserEmail(email)}>
-                  <Text style={styles.saveButton}>Save</Text>
-                </TouchableOpacity>
-                <TouchableOpacity onPress={toggleEmailModal}>
-                  <Text style={styles.cancelButton}>Cancel</Text>
-                </TouchableOpacity>
-              </View>
-            </View>
-          </Modal>
-
-          <TouchableOpacity onPress={togglePasswordModal}>
-            <TouchableOpacity
-              onPress={togglePasswordModal}
-              style={[styles.airportCrad3, styles.airportLayout]}
-            >
-              <View
-                style={[styles.airportCradChild, styles.frameViewPosition]}
-              />
-              <Ionicons
-                style={[styles.reactIconsfafakey]}
-                name="key"
-                size={50}
-                color="#6C6C6C"
-              />
-              <Text style={[styles.email, styles.nameTypo]}>PASSWORD</Text>
-            </TouchableOpacity>
-          </TouchableOpacity>
-          <Modal
-            visible={isPasswordModalVisible}
-            animationType="slide"
-            transparent={true}
-          >
-            <View style={styles.modalContainer}>
-              <View style={styles.modalContent}>
-                <Text style={styles.modalTitle}>Change Password</Text>
-                <TextInput
-                  style={styles.modalInput}
-                  value={password}
-                  onChangeText={(text) => setPassword(text)}
-                  placeholder="Enter new password"
-                  secureTextEntry={true} // This hides the entered password
-                />
-                <TouchableOpacity onPress={() => updateUserPassword(password)}>
-                  <Text style={styles.saveButton}>Save</Text>
-                </TouchableOpacity>
-                <TouchableOpacity onPress={togglePasswordModal}>
-                  <Text style={styles.cancelButton}>Cancel</Text>
-                </TouchableOpacity>
-              </View>
-            </View>
-          </Modal>
-          <TouchableOpacity onPress={handleLogout}>
-            <TouchableOpacity
-              onPress={handleLogout}
-              style={[styles.airportCrad4, styles.airportLayout]}
-            >
-              <View
-                style={[styles.airportCradChild4, styles.frameViewPosition1]}
-              />
-              <Text style={[styles.email1, styles.nameTypo1]}>LOGOUT</Text>
-            </TouchableOpacity>
-          </TouchableOpacity>
-
-          <TouchableOpacity onPress={toggleDeleteModal}>
-            <TouchableOpacity
-              onPress={toggleDeleteModal}
-              style={[styles.airportCrad5, styles.airportLayout]}
-            >
-              <View
-                style={[styles.airportCradChild5, styles.frameViewPosition1]}
-              />
-              <Text style={styles.nameTypo2}>DELETE ACCOUNT</Text>
-            </TouchableOpacity>
-          </TouchableOpacity>
-
-          <Modal
-            visible={isDeleteModalVisible}
-            animationType="slide"
-            transparent={true}
-          >
-            <View style={styles.modalContainer}>
-              <View style={styles.modalContent}>
-                <Text style={styles.modalTitle}>Confirm Deletion</Text>
-                <Text>Please enter your password to confirm:</Text>
-                <TextInput
-                  style={styles.passwordInput}
-                  secureTextEntry={true}
-                  placeholder="Password"
-                  value={password}
-                  onChangeText={(text) => setPassword(text)}
-                />
-                <Text style={styles.errorText}>{deleteError}</Text>
-                <TouchableOpacity onPress={handleDeleteAccount}>
-                  <Text style={styles.confirmButton}>Confirm</Text>
-                </TouchableOpacity>
-                <TouchableOpacity onPress={toggleDeleteModal}>
-                  <Text style={styles.cancelButton}>Cancel</Text>
-                </TouchableOpacity>
-              </View>
-            </View>
-          </Modal>
-        </View>
+          </View>
+        </Modal>
       </View>
+
       <BottomNavigation style={styles.navigation} />
     </View>
   );
 };
 
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: "black",
+  },
+  main: {
+    flex: 1,
+  },
+  centeredContainer: {
+    justifyContent: "center", // Center vertically
+    alignItems: "center", // Center horizontally
+    backgroundColor: "black", // You can change the background color if needed
+    marginTop: windowHeight * 0.065,
+  },
+  hello: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "black",
+  },
+  helloChild: {
+    width: 60,
+    height: 50,
+  },
+  hello1: {
+    fontSize: windowWidth * 0.095,
+    fontFamily: "Poppins-Bold",
+    fontWeight: "700",
+    color: "#fff",
+    marginLeft: 5, // Add margin to separate from the image
+  },
+
+  profileContainer: {
+    paddingHorizontal: 20,
+    paddingTop: windowHeight * 0.07,
+
+    justifyContent: "space-between",
+  },
+  profileInfo: {
+    flexDirection: "column",
+    alignItems: "center",
+    backgroundColor: "black",
+  },
+  profileImageContainer: {
+    marginRight: windowWidth * 0.02,
+    marginBottom: windowHeight * 0.02,
+  },
+  profileImage: {
+    width: 130,
+    height: 130,
+    borderWidth: 2,
+    borderColor: "#ffffff",
+    borderRadius: 75,
+  },
+
+  nameText: {
+    fontFamily: "Overpass-SemiBold",
+    textTransform: "uppercase",
+    letterSpacing: 1,
+    textAlign: "left",
+    fontSize: windowWidth * 0.07, // Adjust this as needed
+    color: "#f7ff88",
+  },
+  exploreText: {
+    textAlign: "left",
+    fontSize: windowWidth * 0.05, // Adjust this as needed
+    color: "rgba(255, 255, 255, 0.8)",
+    fontFamily: "Overpass-Medium",
+  },
+  iconsContainer: {
+    marginTop: windowHeight * 0.03,
+    backgroundColor: "black",
+    alignItems: "center",
+  },
+  iconButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: windowWidth * 0.03,
+    width: windowWidth * 0.7,
+    height: windowHeight * 0.07,
+    borderRadius: 24,
+    backgroundColor: "#07363f",
+  },
+  iconButton1: {
+    flexDirection: "center",
+    justifyContent: "center",
+    alignItems: "center",
+    marginBottom: windowWidth * 0.02,
+    width: windowWidth * 0.7,
+    height: windowHeight * 0.05,
+    borderRadius: 24,
+    backgroundColor: "#f74a4a",
+  },
+  iconButton2: {
+    flexDirection: "center",
+    justifyContent: "center",
+    alignItems: "center",
+    marginBottom: windowWidth * 0.02,
+    width: windowWidth * 0.7,
+    height: windowHeight * 0.05,
+    borderRadius: 24,
+    backgroundColor: "red",
+  },
+  iconBackground: {
+    backgroundColor: "#07363f",
+    borderRadius: 24,
+    width: windowWidth * 0.2,
+    height: windowHeight * 0.06,
+    justifyContent: "center",
+    alignItems: "center",
+    marginRight: 0,
+  },
+
+  iconText: {
+    fontFamily: "Overpass-SemiBold",
+    fontWeight: "600",
+    letterSpacing: 0.1,
+    fontSize: windowWidth * 0.06, // Adjust this as needed
+    textAlign: "left",
+    color: "#fff",
+  },
+  iconTextWhite: {
+    fontFamily: "Overpass-SemiBold",
+    lineHeight: 40,
+    letterSpacing: 1,
+    fontSize: windowWidth * 0.045,
+    textAlign: "center",
+    color: "#fff",
+  },
+  navigation: {
+    position: "absolute",
+    bottom: 0,
+    left: 0,
+    right: 0,
+  },
+
   // modals
   passwordInput: {
     height: 40,
@@ -719,13 +813,6 @@ const styles = StyleSheet.create({
     fontSize: 19,
     marginBottom: 5,
   },
-  pfp1: {
-    width: 130,
-    height: 130,
-    borderWidth: 2,
-    borderColor: "#ffffff",
-    borderRadius: 75,
-  },
   modalContainer: {
     flex: 1,
     justifyContent: "center",
@@ -760,210 +847,6 @@ const styles = StyleSheet.create({
     fontFamily: "Overpass-SemiBold",
     textAlign: "center",
     fontSize: 19,
-  },
-
-  container: {
-    flex: 1,
-    backgroundColor: "black",
-  },
-  navigation: {
-    position: "absolute",
-    bottom: 0,
-    left: 0,
-    right: 0,
-  },
-
-  hiJahedPrince1Typo: {
-    fontFamily: "Poppins-Medium",
-    textTransform: "uppercase",
-    letterSpacing: 1,
-    textAlign: "center",
-    position: "absolute",
-  },
-  airportLayout: {
-    height: 104,
-    width: 365,
-    position: "absolute",
-  },
-  frameViewPosition: {
-    backgroundColor: "#07363f",
-    borderRadius: 24,
-    left: 0,
-    top: 0,
-  },
-  frameViewPosition1: {
-    backgroundColor: "#F53F3F",
-    borderRadius: 24,
-    left: 0,
-    top: 0,
-  },
-
-  // name, email, password
-
-  nameTypo: {
-    fontFamily: "Overpass-SemiBold",
-    fontWeight: "600",
-    letterSpacing: 0.1,
-    fontSize: windowWidth * 0.09,
-    textAlign: "left",
-    color: "#fff",
-  },
-
-  // logout typo
-  nameTypo1: {
-    fontFamily: "Overpass-SemiBold",
-    lineHeight: 70,
-    letterSpacing: 1,
-    fontSize: windowWidth * 0.08,
-    justifyContent: "center",
-    alignContent: "center",
-    textAlign: "center",
-    color: "#fff",
-  },
-
-  // delete typo
-  nameTypo2: {
-    fontFamily: "Overpass-SemiBold",
-    lineHeight: 40,
-    letterSpacing: 1,
-    fontSize: windowWidth * 0.05,
-    textAlign: "center",
-    color: "#fff",
-    marginTop: 2,
-  },
-
-  //Hi, lets explore
-
-  hiJahedPrince1: {
-    // top: 282,
-    top: windowHeight * 0.304,
-    fontSize: windowWidth * 0.07,
-    lineHeight: 48,
-    color: "#f7ff88",
-    alignItems: "center",
-    alignContent: "center",
-    justifyContent: "center",
-  },
-  letsExploreThe1: {
-    top: windowHeight * 0.344,
-    textAlign: "center",
-    fontSize: windowWidth * 0.045,
-    justifyContent: "center",
-    alignItems: "center",
-    lineHeight: 30,
-    color: "rgba(255, 255, 255, 0.8)",
-  },
-
-  //pfp
-  pfp: {
-    top: windowHeight * -0.04,
-    // left: windowWidth * 0.1,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-
-  airportCradChild: {
-    height: 100,
-    width: 365,
-    position: "absolute",
-  },
-  airportCradChild4: {
-    height: 60,
-    width: 365,
-    position: "absolute",
-  },
-  airportCradChild5: {
-    height: 40,
-    width: 365,
-    position: "absolute",
-  },
-
-  reactIconsfafaenvelope: {
-    left: windowWidth * 0.08,
-    top: windowHeight * 0.025,
-  },
-  reactIconsfafakey: {
-    left: windowWidth * 0.08,
-    top: windowHeight * 0.025,
-  },
-  reactIconsfafauser: {
-    left: windowWidth * 0.095,
-    top: windowHeight * 0.025,
-  },
-  email: {
-    left: windowWidth * 0.23,
-    width: 229,
-    top: windowHeight * 0.03,
-    height: 48,
-    position: "absolute",
-  },
-
-  airportCrad1: {
-    left: 0,
-    top: 0,
-  },
-  airportCrad2: {
-    top: windowHeight * 0.12,
-    left: 0,
-  },
-  airportCrad3: {
-    top: windowHeight * 0.24,
-    left: 0,
-  },
-
-  airportCrad: {
-    top: windowHeight * 0.2,
-    width: 360,
-    height: 340,
-    position: "absolute",
-    alignContent: "center",
-    justifyContent: "center",
-  },
-
-  airportCrad4: {
-    top: windowHeight * 0.37,
-    left: 0,
-  },
-  airportCrad5: {
-    top: windowHeight * 0.45,
-    left: 0,
-  },
-
-  myProfile: {
-    backgroundColor: "#070606",
-    flex: 1,
-    width: "100%",
-    height: "100%",
-    alignItems: "center",
-  },
-
-  hello1: {
-    fontSize: windowWidth * 0.095,
-    fontFamily: "Poppins-Bold",
-    textAlign: "left",
-    fontWeight: "700",
-    color: "#fff",
-    left: 0,
-    top: 0,
-    margin: 5,
-    position: "relative",
-  },
-  helloChild: {
-    top: windowHeight * 0.077,
-    left: windowWidth * 0.69,
-    width: 60,
-    height: 50,
-    position: "absolute",
-  },
-  hello: {
-    top: windowHeight * 0.0,
-    width: 400,
-    height: 190,
-    left: windowWidth * -0.04,
-    position: "relative",
-    alignContent: "center",
-    justifyContent: "center",
-    alignItems: "center",
   },
 });
 

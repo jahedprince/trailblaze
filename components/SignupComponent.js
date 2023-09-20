@@ -7,6 +7,8 @@ import {
   TextInput,
   TouchableWithoutFeedback,
   Keyboard,
+  Dimensions,
+  ScrollView,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import firebase from "firebase/app";
@@ -45,6 +47,9 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
+
+const windowWidth = Dimensions.get("window").width;
+const windowHeight = Dimensions.get("window").height;
 
 const SignupComponent = () => {
   const navigation = useNavigation();
@@ -236,23 +241,22 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     backgroundColor: "white",
-    borderRadius: 24,
-    width: 320,
-    height: 390,
+    borderRadius: windowWidth * 0.05,
+    width: windowWidth * 0.8,
+    height: windowHeight * 0.5,
     // top: 10,
     // left: 125,
   },
   backgroundOverlay: {
     position: "absolute",
     backgroundColor: "rgba(7, 54, 63, 0.8)",
-    borderRadius: 24,
-    width: 370,
-    height: 440,
+    borderRadius: windowWidth * 0.05,
+    width: windowWidth * 0.9,
+    height: windowHeight * 0.55,
   },
   loginTitle: {
     fontFamily: "Poppins-Bold",
-    fontSize: 32,
-    lineHeight: 48,
+    fontSize: windowWidth * 0.075,
     color: "#f7ff88",
     marginTop: 20,
     textTransform: "uppercase",
@@ -261,28 +265,33 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     marginTop: 10,
-    width: 230,
+    textAlign: "center",
+    justifyContent: "center",
   },
   haveAccountText: {
     fontFamily: "Poppins-Medium",
     color: "rgba(255, 255, 255, 1)",
+    fontSize: windowWidth * 0.035,
   },
   loginLink: {
     fontFamily: "Poppins-Medium",
     color: "#00a3ff",
     marginLeft: 5,
+    fontSize: windowWidth * 0.035,
   },
   inputContainer: {
     flexDirection: "row",
     alignItems: "center",
     marginTop: 20,
-    width: 300,
+    width: windowWidth * 0.7,
+    textAlign: "center",
+    justifyContent: "center",
   },
   inputIcon: {
     backgroundColor: "#091C20",
     borderRadius: 24,
-    width: 300,
-    height: 40,
+    width: windowWidth * 0.7,
+    height: windowWidth * 0.1,
     justifyContent: "flex-start",
     alignItems: "center",
     flexDirection: "row",
@@ -295,25 +304,23 @@ const styles = StyleSheet.create({
     fontFamily: "Poppins-Medium",
     color: "#848484",
     marginLeft: 10,
-    fontSize: 20,
-    width: 240,
+    fontSize: windowWidth * 0.045,
+    width: windowWidth * 0.56,
   },
   signupButtonContainer: {
     backgroundColor: "#00a3ff",
     borderRadius: 24,
-    width: 280,
-    height: 40,
+    width: windowWidth * 0.7,
+    height: windowWidth * 0.09,
     marginTop: 20,
     marginBottom: 10,
     justifyContent: "center",
     alignItems: "center",
-    marginLeft: 20,
-    marginRight: 20,
   },
   signupButton: {
     fontFamily: "Poppins-Medium",
     color: "#fff",
-    fontSize: 20,
+    fontSize: windowWidth * 0.05,
     fontWeight: "500",
     textTransform: "uppercase",
     letterSpacing: 1,
@@ -326,12 +333,11 @@ const styles = StyleSheet.create({
     fontFamily: "Poppins-Medium",
     color: "#FD5D5D",
     marginTop: 5,
-    fontSize: 14,
-    marginBottom: 20,
+    fontSize: windowWidth * 0.035,
     textDecorationLine: "underline",
-    marginLeft: 6,
-    marginRight: 6,
     textAlign: "center",
+    justifyContent: "center",
+    alignItems: "center",
   },
 });
 
