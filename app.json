@@ -17,7 +17,8 @@
     "ios": {
       "supportsTablet": false,
       "bundleIdentifier": "com.jahedprince.TrailBlaze",
-      "buildNumber": "1.0.1"
+      "buildNumber": "1.0.1",
+      "supportedDevices": ["iPhone"]
     },
     "android": {
       "adaptiveIcon": {

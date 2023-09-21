@@ -219,6 +219,7 @@ const SignupComponent = () => {
               onChangeText={(text) => setPassword(text)}
               blurOnSubmit={true}
               placeholderTextColor="#4C4C4C"
+              onSubmitEditing={handleSignUp}
             />
           </View>
         </View>
