@@ -44,7 +44,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     textAlign: "center",
-    justifyContent: "center",
+    marginTop: windowHeight * 0.21,
     alignItems: "center",
   },
   ellipseParent: {

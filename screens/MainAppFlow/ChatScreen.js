@@ -95,7 +95,7 @@ const ChatScreen = () => {
       if (!keywords.some((keyword) => messageText.includes(keyword))) {
         const botMessage = {
           _id: new Date().getTime() + 1,
-          text: "I can help you create a travel itinerary. Just let me know the destination and duration of your trip.",
+          text: "I can help you create a travel itinerary. Just let me know the destination and duration of your trip. Please provide the travel destination and the duration of your trip in the format: 'Travel to Destination for X days'.",
           createdAt: new Date(),
           user: {
             _id: 2,
