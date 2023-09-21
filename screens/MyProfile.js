@@ -53,6 +53,7 @@ import { useNavigation } from "@react-navigation/native";
 import * as ImagePicker from "expo-image-picker";
 import { uploadBytesResumable } from "firebase/storage";
 import { width } from "deprecated-react-native-prop-types/DeprecatedImagePropType";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const windowWidth = Dimensions.get("window").width;
 const windowHeight = Dimensions.get("window").height;
@@ -98,28 +99,43 @@ const MyProfile = () => {
 
           if (userDocSnap.exists()) {
             const userData = userDocSnap.data();
-            // Set the user's name and profile picture URL from Firestore data
             const userName = userData.name || "";
 
             setName(userName);
-            const userProfilePicUrl = userData.profilePictureUrl || null;
-            setProfilePictureUrl(userProfilePicUrl);
 
-            // Preload the profile picture (if available)
-            if (userProfilePicUrl) {
-              await Image.prefetch(userProfilePicUrl); // Wait for the image to prefetch
-              setLoadingImage(false); // Set isLoadingImage to false when image is loaded
+            // Check if the profile picture URL is already cached
+            const cachedProfilePictureUrl = await AsyncStorage.getItem(
+              "profilePictureUrl"
+            );
+
+            if (cachedProfilePictureUrl) {
+              // If cached URL is available, use it directly
+              setProfilePictureUrl(cachedProfilePictureUrl);
+              setLoadingImage(false);
             } else {
-              setLoadingImage(false); // Set isLoadingImage to false when no image is available
+              const userProfilePicUrl = userData.profilePictureUrl || null;
+              setProfilePictureUrl(userProfilePicUrl);
+
+              if (userProfilePicUrl) {
+                await Image.prefetch(userProfilePicUrl);
+                setLoadingImage(false);
+                // Cache the profile picture URL for future use
+                await AsyncStorage.setItem(
+                  "profilePictureUrl",
+                  userProfilePicUrl
+                );
+              } else {
+                setLoadingImage(false);
+              }
             }
           } else {
             console.error("User document does not exist in Firestore");
-            setLoadingImage(false); // Set isLoadingImage to false on error
+            setLoadingImage(false);
           }
         }
       } catch (error) {
         console.error("Error fetching user data:", error);
-        setLoadingImage(false); // Set isLoadingImage to false on error
+        setLoadingImage(false);
       }
     };
 
@@ -264,7 +280,7 @@ const MyProfile = () => {
         await ImagePicker.requestMediaLibraryPermissionsAsync();
       if (status !== "granted") {
         alert("Permission to access photos was denied");
-        setLoadingImage(false); // Set isLoadingImage to false on permission denied
+        setLoadingImage(false);
         return;
       }
 
@@ -301,6 +317,9 @@ const MyProfile = () => {
           profilePictureUrl: downloadURL,
         });
 
+        // Remove the cached profile picture URL
+        await AsyncStorage.removeItem("profilePictureUrl");
+
         // Set the profile picture URL in the component state
         setProfilePictureUrl(downloadURL);
 
@@ -312,7 +331,7 @@ const MyProfile = () => {
       }
     } catch (error) {
       console.error("Error selecting/uploading profile picture:", error);
-      setLoadingImage(false); // Set isLoadingImage to false on error
+      setLoadingImage(false);
       // Handle errors, e.g., show an error message to the user
     }
   };
@@ -363,6 +382,9 @@ const MyProfile = () => {
       await updateDoc(userDocRef, {
         profilePictureUrl: null,
       });
+
+      // Remove the cached profile picture URL
+      await AsyncStorage.removeItem("profilePictureUrl");
 
       // Set the profile picture URL to null in the component state
       setProfilePictureUrl(null);
@@ -459,7 +481,7 @@ const MyProfile = () => {
                 />
               ) : (
                 <Entypo
-                  style={styles.profileImage}
+                  style={styles.profileImage1}
                   name="user"
                   size={130}
                   color="white"
@@ -690,7 +712,11 @@ const styles = StyleSheet.create({
     borderColor: "#ffffff",
     borderRadius: 75,
   },
-
+  profileImag1: {
+    width: 130,
+    height: 130,
+    borderRadius: 75,
+  },
   nameText: {
     fontFamily: "Overpass-SemiBold",
     textTransform: "uppercase",
