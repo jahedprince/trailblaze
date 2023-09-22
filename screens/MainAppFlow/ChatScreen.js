@@ -156,8 +156,7 @@ const ChatScreen = () => {
       );
 
       // Process the itinerary text to extract day-by-day details
-      // Process the itinerary text to extract day-by-day details
-      const daysPattern = /Day\s+(\d+)(?::)?\s+(.*?)(?=(?:Day\s+\d+|$))/gs;
+      const daysPattern = /Day\s+(\d+):\s+(.*?)(?=(?:Day\s+\d+|$))/gs;
       let dayMatches;
       const dayDetails = [];
 

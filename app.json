@@ -12,13 +12,12 @@
       "backgroundColor": "#ffffff"
     },
     "platforms": ["ios", "android"],
-    "supportsTablet": false,
+
     "assetBundlePatterns": ["**/*"],
     "ios": {
       "supportsTablet": false,
       "bundleIdentifier": "com.jahedprince.TrailBlaze",
-      "buildNumber": "1.0.1",
-      "supportedDevices": ["iPhone"]
+      "buildNumber": "1.0.1"
     },
     "android": {
       "adaptiveIcon": {
