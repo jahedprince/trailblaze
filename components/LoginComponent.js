@@ -19,12 +19,20 @@ import {
   AuthErrorCodes,
   sendPasswordResetEmail,
 } from "firebase/auth";
-import { collection, query, where, getDocs } from "firebase/firestore";
+import {
+  collection,
+  query,
+  where,
+  getDocs,
+  updateDoc,
+  doc,
+} from "firebase/firestore";
 import { getFirestore } from "firebase/firestore";
 import { useUser } from "../Providers/UserContext";
 import { FontAwesome } from "@expo/vector-icons";
 import { FontAwesome5 } from "@expo/vector-icons";
-
+import * as LocalAuthentication from "expo-local-authentication";
+import Checkbox from "expo-checkbox";
 import {
   FIREBASE_API_KEY,
   FIREBASE_AUTH_DOMAIN,
@@ -33,6 +41,7 @@ import {
   FIREBASE_MESSAGING_SENDER_ID,
   FIREBASE_APP_ID,
 } from "@env";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const firebaseConfig = {
   apiKey: FIREBASE_API_KEY,
@@ -98,11 +107,22 @@ const LoginComponent = () => {
   const [error, setError] = useState(null);
   const [userUid, setUserUid] = useState(null); // New state variable to store the user's UID
   const { setUserData } = useUser();
+  const [faceIdEnabled, setFaceIdEnabled] = useState(true); // Default to true, change as needed
 
   const handleClick = () => {
     navigation.navigate("signup");
   };
 
+  const updateFirestoreField = async (userUid, fieldName, value) => {
+    try {
+      const userRef = doc(db, "users", userUid);
+      await updateDoc(userRef, {
+        [fieldName]: value,
+      });
+    } catch (error) {
+      throw error;
+    }
+  };
   const handleSignIn = async () => {
     try {
       Keyboard.dismiss();
@@ -119,10 +139,45 @@ const LoginComponent = () => {
         return;
       }
 
-      console.log("User signed in:", user);
+      // Check if Face ID/Touch ID is enabled
+      const isBiometricAvailable = await LocalAuthentication.hasHardwareAsync();
+      if (isBiometricAvailable && faceIdEnabled) {
+        const result = await LocalAuthentication.authenticateAsync({
+          promptMessage: "Authenticate to continue",
+        });
+
+        if (result.success) {
+          // Biometric authentication successful
+          console.log("Biometric authentication successful");
+          // Store email and password for next sign-in
+          await AsyncStorage.setItem("email", email);
+          await AsyncStorage.setItem("password", password);
+          await AsyncStorage.setItem("biometricEnabled", JSON.stringify(true));
+        } else {
+          // Biometric authentication failed
+          console.log("Biometric authentication failed");
+          // Set faceIdEnabled to false if biometric authentication failed
+          setFaceIdEnabled(false);
+          // Clear stored email and password
+          await AsyncStorage.removeItem("email");
+          await AsyncStorage.removeItem("password");
+          await AsyncStorage.removeItem("biometricEnabled");
+        }
+      } else {
+        // Face ID/Touch ID is not enabled
+        // Clear stored email and password when the user unchecks the option
+        if (!faceIdEnabled) {
+          await AsyncStorage.removeItem("email");
+          await AsyncStorage.removeItem("password");
+          await AsyncStorage.removeItem("biometricEnabled");
+        }
+      }
 
       // Set the user's UID
       setUserUid(user.uid);
+
+      // Update the Firestore field (e.g., 'faceIdEnabled') to indicate biometric authentication preference
+      await updateFirestoreField(user.uid, "faceIdEnabled", faceIdEnabled);
 
       // Fetch user-specific data from Firestore
       const userData = await fetchUserDataFromFirestore(user.uid);
@@ -133,7 +188,7 @@ const LoginComponent = () => {
       setUserData(userData);
 
       // Redirect to the homepage and pass user data and itineraries as navigation parameters
-      navigation.navigate("Home", { userData, userItineraries, userUid }); // Pass userUid as a parameter
+      navigation.navigate("Home", { userData, userItineraries, userUid });
 
       setError(null);
     } catch (error) {
@@ -166,10 +221,20 @@ const LoginComponent = () => {
 
         setError(errorMessage);
       }
-
-      //   console.error("Authentication error:", error);
     }
   };
+
+  useEffect(() => {
+    // Check if email and password are stored in AsyncStorage
+    AsyncStorage.multiGet(["email", "password"]).then((data) => {
+      const storedEmail = data[0][1];
+      const storedPassword = data[1][1];
+      if (storedEmail && storedPassword) {
+        setEmail(storedEmail);
+        setPassword(storedPassword);
+      }
+    });
+  }, []);
 
   const handleForgotPassword = async () => {
     try {
@@ -247,6 +312,14 @@ const LoginComponent = () => {
         <Text style={styles.forgotPassword} onPress={handleForgotPassword}>
           Forgot Password?
         </Text>
+
+        <View style={styles.inputIcon1}>
+          <Checkbox
+            value={faceIdEnabled}
+            onValueChange={(newValue) => setFaceIdEnabled(newValue)}
+          />
+          <Text style={styles.inputLabel1}>Enable Face ID/Touch ID</Text>
+        </View>
         {error && <Text style={styles.errorMessage}>{error}</Text>}
       </View>
     </TouchableWithoutFeedback>
@@ -313,6 +386,14 @@ const styles = StyleSheet.create({
     alignItems: "center",
     flexDirection: "row",
   },
+  inputIcon1: {
+    borderRadius: 24,
+    marginTop: windowHeight * 0.01,
+    justifyContent: "center",
+    alignItems: "center",
+    flexDirection: "row",
+  },
+
   icon: {
     height: 27,
     width: 26,
@@ -323,6 +404,12 @@ const styles = StyleSheet.create({
     marginLeft: 10,
     fontSize: windowWidth * 0.045,
     width: windowWidth * 0.56,
+  },
+  inputLabel1: {
+    fontFamily: "Poppins-Medium",
+    color: "#fff",
+    marginLeft: windowWidth * 0.02,
+    fontSize: windowWidth * 0.035,
   },
 
   loginButtonContainer: {
