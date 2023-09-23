@@ -108,7 +108,7 @@ const LoginComponent = () => {
   const [userUid, setUserUid] = useState(null); // New state variable to store the user's UID
   const { setUserData } = useUser();
   const [faceIdEnabled, setFaceIdEnabled] = useState(true); // Default to true, change as needed
-
+  const [showPassword, setShowPassword] = useState(false);
   const handleClick = () => {
     navigation.navigate("signup");
   };
@@ -291,15 +291,26 @@ const LoginComponent = () => {
               color="#6C6C6C"
             />
             <TextInput
-              style={styles.inputLabel}
+              style={styles.inputLabel2}
               placeholder="Password"
-              secureTextEntry
+              secureTextEntry={!showPassword} // Toggle secureTextEntry based on showPassword state
               value={password}
               onChangeText={(text) => setPassword(text)}
               placeholderTextColor="#4C4C4C"
               blurOnSubmit={true}
               onSubmitEditing={handleSignIn}
             />
+            {/* Add Show Password button */}
+            <TouchableOpacity
+              style={styles.showPasswordButton}
+              onPress={() => setShowPassword(!showPassword)}
+            >
+              <FontAwesome
+                name={showPassword ? "eye-slash" : "eye"}
+                size={19}
+                color="#6C6C6C"
+              />
+            </TouchableOpacity>
           </View>
         </View>
         <TouchableOpacity
@@ -315,6 +326,7 @@ const LoginComponent = () => {
 
         <View style={styles.inputIcon1}>
           <Checkbox
+            style={styles.checkbox}
             value={faceIdEnabled}
             onValueChange={(newValue) => setFaceIdEnabled(newValue)}
           />
@@ -387,8 +399,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
   },
   inputIcon1: {
-    borderRadius: 24,
-    marginTop: windowHeight * 0.01,
+    marginTop: windowHeight * 0.015,
     justifyContent: "center",
     alignItems: "center",
     flexDirection: "row",
@@ -411,7 +422,14 @@ const styles = StyleSheet.create({
     marginLeft: windowWidth * 0.02,
     fontSize: windowWidth * 0.035,
   },
-
+  inputLabel2: {
+    fontFamily: "Poppins-Medium",
+    color: "#848484",
+    marginLeft: 10,
+    marginRight: 4,
+    fontSize: windowWidth * 0.045,
+    width: windowWidth * 0.52,
+  },
   loginButtonContainer: {
     backgroundColor: "#00a3ff",
     borderRadius: 24,
@@ -442,6 +460,11 @@ const styles = StyleSheet.create({
     textAlign: "center",
     justifyContent: "center",
     alignItems: "center",
+  },
+  checkbox: {
+    borderColor: "white", // Border color
+
+    borderWidth: 1,
   },
 });
 

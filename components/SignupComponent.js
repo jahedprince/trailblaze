@@ -109,6 +109,7 @@ const SignupComponent = () => {
         name, // Include the user's name
         // Add other user data here
         profilePictureUrl,
+        faceIdEnabled: false,
       });
 
       // Redirect to the login page or any desired screen
