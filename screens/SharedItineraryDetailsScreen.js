@@ -14,7 +14,13 @@ import {
   Dimensions,
 } from "react-native";
 import { initializeApp } from "firebase/app";
-import { getFirestore, doc, onSnapshot, updateDoc } from "firebase/firestore";
+import {
+  getFirestore,
+  doc,
+  onSnapshot,
+  updateDoc,
+  arrayUnion,
+} from "firebase/firestore";
 import { getDoc } from "firebase/firestore";
 import { Entypo } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
@@ -32,6 +38,8 @@ import Swipeout from "react-native-swipeout";
 import { FontAwesome } from "@expo/vector-icons";
 import { Feather } from "@expo/vector-icons";
 import { Ionicons } from "@expo/vector-icons";
+import { getAuth } from "firebase/auth";
+import { AntDesign } from "@expo/vector-icons";
 
 const windowWidth = Dimensions.get("window").width;
 const windowHeight = Dimensions.get("window").height;
@@ -44,6 +52,8 @@ const SharedItineraryDetailsScreen = ({ route }) => {
   const [itineraryDocId, setItineraryDocId] = useState("");
   const [userProfilePicture1, setUserProfilePicture] =
     useState(userProfilePicture);
+
+  const [userHasAccess, setUserHasAccess] = useState(false);
 
   useEffect(() => {
     const firebaseConfig = {
@@ -68,6 +78,13 @@ const SharedItineraryDetailsScreen = ({ route }) => {
         if (docSnapshot.exists()) {
           const sharedItinerary = docSnapshot.data();
           setItineraryData(sharedItinerary);
+          // Check if the current user's UID is in the usersAdded array
+          const auth = getAuth(); // Get the Firebase Auth object
+          const currentUser = auth.currentUser; // Get the current user
+          const currentUserUid = currentUser.uid;
+
+          const hasAccess = sharedItinerary.usersAdded.includes(currentUserUid);
+          setUserHasAccess(hasAccess);
         }
       }
     );
@@ -168,6 +185,30 @@ const SharedItineraryDetailsScreen = ({ route }) => {
       }
     };
 
+    // const handleRequestAccess = () => {
+    //   const auth = getAuth();
+    //   const currentUser = auth.currentUser;
+    //   const currentUserUid = currentUser.uid;
+
+    //   const updatedItinerary = { ...itineraryData };
+
+    //   if (!updatedItinerary.usersRequested.includes(currentUserUid)) {
+    //     updatedItinerary.usersRequested.push(currentUserUid);
+
+    //     const db = getFirestore();
+    //     const sharedItineraryRef = doc(
+    //       db,
+    //       "sharedItineraries",
+    //       sharedItineraryId
+    //     );
+
+    //     // Update Firestore with the updated usersRequested array
+    //     updateDoc(sharedItineraryRef, {
+    //       usersRequested: updatedItinerary.usersRequested,
+    //     });
+    //   }
+    // };
+
     const addNewActivity = (dayIndex) => {
       const newText = newActivityTexts[dayIndex]; // Get the text for the current day
       if (newText.trim() !== "") {
@@ -199,7 +240,6 @@ const SharedItineraryDetailsScreen = ({ route }) => {
         setNewActivityTexts(updatedTexts);
       }
     };
-
     const activities = item.activities.map((activity, activityIndex) => {
       const isEditing =
         activityIndex === editingActivity?.activityIndex &&
@@ -215,92 +255,101 @@ const SharedItineraryDetailsScreen = ({ route }) => {
       };
 
       return (
-        <Swipeout
-          right={[
-            {
-              component: (
-                <View
-                  style={{
-                    backgroundColor: "#357FEE",
-                    borderRadius: 15,
-                    flex: 0.95,
-                    justifyContent: "center",
-                    alignItems: "center",
-                    marginBottom: 1,
+        <TouchableOpacity onPress={onPress} key={activityIndex}>
+          {userHasAccess ? (
+            <Swipeout
+              right={[
+                {
+                  component: (
+                    <View
+                      style={{
+                        backgroundColor: "#357FEE",
+                        borderRadius: 15,
+                        flex: 0.95,
+                        justifyContent: "center",
+                        alignItems: "center",
+                        marginBottom: 1,
+                      }}
+                    >
+                      <Feather name="edit" size={28} color="white" />
+                    </View>
+                  ),
+                  backgroundColor: "transparent",
+                  onPress: () => onEdit(activityIndex),
+                },
+                {
+                  component: (
+                    <View
+                      style={{
+                        backgroundColor: "#E92B2B",
+                        borderRadius: 15,
+                        flex: 0.95,
+                        justifyContent: "center",
+                        alignItems: "center",
+                        marginBottom: 0,
+                      }}
+                    >
+                      <FontAwesome name="trash" size={28} color="white" />
+                    </View>
+                  ),
+                  backgroundColor: "transparent",
+                  onPress: () => onDelete(activityIndex),
+                },
+              ]}
+              autoClose={true}
+              backgroundColor="transparent"
+            >
+              {isEditing ? (
+                <TextInput
+                  style={styles.itineraryDetails}
+                  value={activity}
+                  onChangeText={(text) => {
+                    // Update the local state
+                    const updatedItinerary = { ...itineraryData };
+                    updatedItinerary.days[index].activities[activityIndex] =
+                      text;
+                    setEditingActivity({
+                      dayIndex: index,
+                      activityIndex,
+                    });
                   }}
-                >
-                  <Feather name="edit" size={28} color="white" />
-                </View>
-              ),
-              backgroundColor: "transparent",
-              onPress: () => onEdit(activityIndex),
-            },
-            {
-              component: (
-                <View
-                  style={{
-                    backgroundColor: "#E92B2B",
-                    borderRadius: 15,
-                    flex: 0.95,
-                    justifyContent: "center",
-                    alignItems: "center",
-                    marginBottom: 0,
+                  onBlur={() => {
+                    setEditingActivity(null);
+                    // Update Firestore with the new activity text here
+                    updateFirestoreWithActivity(activityIndex, activity);
                   }}
-                >
-                  <FontAwesome name="trash" size={28} color="white" />
-                </View>
-              ),
-              backgroundColor: "transparent",
-              onPress: () => onDelete(activityIndex),
-            },
-          ]}
-          autoClose={true}
-          backgroundColor="transparent"
-          key={activityIndex}
-        >
-          <TouchableOpacity onPress={onPress}>
-            {isEditing ? (
-              <TextInput
-                style={styles.itineraryDetails}
-                value={activity}
-                onChangeText={(text) => {
-                  // Update the local state
-                  const updatedItinerary = { ...itineraryData };
-                  updatedItinerary.days[index].activities[activityIndex] = text;
-                  setEditingActivity({
-                    dayIndex: index,
-                    activityIndex,
-                  });
-                }}
-                onBlur={() => {
-                  setEditingActivity(null);
-                  // Update Firestore with the new activity text here
-                  updateFirestoreWithActivity(activityIndex, activity);
-                }}
-                onSubmitEditing={() => {
-                  setEditingActivity(null);
-                  // Update Firestore with the new activity text here
-                  updateFirestoreWithActivity(activityIndex, activity);
-                }}
-                autoFocus
-                multiline
-                blurOnSubmit={true}
-              />
-            ) : (
-              <Text style={styles.itineraryDetails}>
-                {activity.startsWith("-") ? activity.slice(1).trim() : activity}
-              </Text>
-            )}
-          </TouchableOpacity>
+                  onSubmitEditing={() => {
+                    setEditingActivity(null);
+                    // Update Firestore with the new activity text here
+                    updateFirestoreWithActivity(activityIndex, activity);
+                  }}
+                  autoFocus
+                  multiline
+                  blurOnSubmit={true}
+                />
+              ) : (
+                <Text style={styles.itineraryDetails}>
+                  {activity.startsWith("-")
+                    ? activity.slice(1).trim()
+                    : activity}
+                </Text>
+              )}
+            </Swipeout>
+          ) : (
+            // If the user does not have access, render the activity text without Swipeout
+            <Text style={styles.itineraryDetails}>
+              {activity.startsWith("-") ? activity.slice(1).trim() : activity}
+            </Text>
+          )}
           {activityIndex !== item.activities.length - 1 && <Text>{"\n"}</Text>}
-        </Swipeout>
+        </TouchableOpacity>
       );
     });
 
     return (
       <TouchableOpacity activeOpacity={0.8} style={styles.itineraryItem}>
         <LinearGradient
-          colors={["rgba(7, 54, 63, 1)", "rgba(10, 46, 53, 1)"]}
+          colors={["#0a2e55", "#0a2e55"]}
           style={styles.linearGradient}
         >
           <View style={styles.iconAndHeader}>
@@ -308,29 +357,60 @@ const SharedItineraryDetailsScreen = ({ route }) => {
           </View>
           {activities}
 
-          <TextInput
-            style={styles.newActivityInput}
-            placeholder="Add a new activity"
-            value={newActivityTexts[index]}
-            onChangeText={(text) => {
-              const updatedTexts = [...newActivityTexts];
-              updatedTexts[index] = text;
-              setNewActivityTexts(updatedTexts);
-            }}
-          />
-          <TouchableOpacity
-            style={styles.addButton}
-            onPress={() => addNewActivity(index)}
-          >
-            <Ionicons
-              name="ios-add-circle-outline"
-              size={31}
-              color="rgba(34, 221, 133, 0.8)"
-            />
-          </TouchableOpacity>
+          {userHasAccess && (
+            <View>
+              <TextInput
+                style={styles.newActivityInput}
+                placeholder="Add a new activity"
+                value={newActivityTexts[index]}
+                onChangeText={(text) => {
+                  const updatedTexts = [...newActivityTexts];
+                  updatedTexts[index] = text;
+                  setNewActivityTexts(updatedTexts);
+                }}
+              />
+              <TouchableOpacity
+                style={styles.addButton}
+                onPress={() => addNewActivity(index)}
+              >
+                <Ionicons
+                  name="ios-add-circle-outline"
+                  size={31}
+                  color="rgba(34, 221, 133, 0.8)"
+                />
+              </TouchableOpacity>
+            </View>
+          )}
         </LinearGradient>
       </TouchableOpacity>
     );
+  };
+
+  const handleRequestAccess = async () => {
+    try {
+      const auth = getAuth();
+      const currentUser = auth.currentUser;
+      const currentUserUid = currentUser.uid;
+
+      const db = getFirestore();
+      const sharedItineraryRef = doc(
+        db,
+        "sharedItineraries",
+        sharedItineraryId
+      );
+
+      // Add the current user's UID to the usersRequested array
+      await updateDoc(sharedItineraryRef, {
+        usersRequested: arrayUnion(currentUserUid),
+      });
+
+      // Show a message to the user indicating that the request was sent
+      // You can use a toast, alert, or any other method to display the message
+      // For example:
+      alert("Access request sent successfully!");
+    } catch (error) {
+      console.error("Error requesting access:", error);
+    }
   };
 
   return (
@@ -361,10 +441,20 @@ const SharedItineraryDetailsScreen = ({ route }) => {
                 <Entypo name="user" size={75} color="white" />
               )}
             </View>
-            <View>
-              <Text style={styles.destination}>
-                {itineraryData?.destination}
-              </Text>
+            <View style={styles.destinationInfo}>
+              <View style={{ flexDirection: "row", alignItems: "center" }}>
+                <Text style={styles.destination}>
+                  {itineraryData?.destination}
+                </Text>
+                {!userHasAccess && (
+                  <TouchableOpacity
+                    style={styles.requestAccessButton}
+                    onPress={handleRequestAccess}
+                  >
+                    <AntDesign name="addusergroup" size={30} color="white" />
+                  </TouchableOpacity>
+                )}
+              </View>
               <Text style={styles.duration}>
                 {itineraryData
                   ? `Duration: ${itineraryData.duration} days`
@@ -568,6 +658,20 @@ const styles = StyleSheet.create({
     fontSize: windowWidth * 0.05,
     color: "white",
     textAlign: "center",
+  },
+
+  destinationRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 10,
+  },
+  destinationInfo: {
+    flex: 1, // Take up remaining space
+  },
+  requestAccessButton: {
+    alignItems: "center",
+    justifyContent: "center",
+    margin: 10, // Add some spacing
   },
 });
 

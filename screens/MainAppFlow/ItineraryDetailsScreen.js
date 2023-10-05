@@ -12,6 +12,10 @@ import {
   TouchableWithoutFeedback,
   Keyboard,
   Dimensions,
+  Modal,
+  Pressable,
+  SafeAreaView,
+  SectionList,
 } from "react-native";
 import { initializeApp } from "firebase/app";
 import {
@@ -27,6 +31,8 @@ import {
   addDoc,
   setDoc,
   getDoc,
+  arrayUnion,
+  arrayRemove,
 } from "firebase/firestore";
 import { LinearGradient } from "expo-linear-gradient";
 import {
@@ -56,6 +62,14 @@ const ItineraryDetailsScreen = ({ route }) => {
   );
   const [itineraryDocId, setItineraryDocId] = useState("");
   const [isItineraryUploaded, setIsItineraryUploaded] = useState(false);
+
+  // New state variables for the modal and users
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [usersAdded, setUsersAdded] = useState([]);
+  const [usersRequested, setUsersRequested] = useState([]);
+
+  const [usersAddedNames, setUsersAddedNames] = useState({});
+  const [usersRequestedNames, setUsersRequestedNames] = useState({});
 
   useEffect(() => {
     const firebaseConfig = {
@@ -121,6 +135,157 @@ const ItineraryDetailsScreen = ({ route }) => {
       unsubscribeItinerary();
     };
   }, []);
+
+  const fetchUserName = async (userUID) => {
+    try {
+      const db = getFirestore();
+      const userDocRef = doc(db, "users", userUID); // Replace "users" with your actual collection name
+      const userDocSnapshot = await getDoc(userDocRef);
+
+      if (userDocSnapshot.exists()) {
+        const userData = userDocSnapshot.data();
+        return userData.name;
+      } else {
+        return "Unknown User";
+      }
+    } catch (error) {
+      console.error("Error fetching user name: ", error);
+      return "Unknown User";
+    }
+  };
+
+  const toggleModal = async () => {
+    setIsModalVisible(!isModalVisible);
+
+    if (!isModalVisible) {
+      // If the modal is being opened, fetch user names for usersAdded and usersRequested
+      try {
+        const db = getFirestore();
+        const sharedItineraryRef = doc(db, "sharedItineraries", itineraryDocId);
+        const sharedItineraryDoc = await getDoc(sharedItineraryRef);
+
+        if (sharedItineraryDoc.exists()) {
+          const sharedItineraryData = sharedItineraryDoc.data();
+          setUsersAdded(sharedItineraryData.usersAdded || []);
+          setUsersRequested(sharedItineraryData.usersRequested || []);
+
+          // Fetch and update user names for usersAdded
+          const usersAddedNamesData = {};
+          for (const userUID of sharedItineraryData.usersAdded || []) {
+            const userName = await fetchUserName(userUID);
+            usersAddedNamesData[userUID] = userName;
+          }
+          setUsersAddedNames(usersAddedNamesData);
+
+          // Fetch and update user names for usersRequested
+          const usersRequestedNamesData = {};
+          for (const userUID of sharedItineraryData.usersRequested || []) {
+            const userName = await fetchUserName(userUID);
+            usersRequestedNamesData[userUID] = userName;
+          }
+          setUsersRequestedNames(usersRequestedNamesData);
+        }
+      } catch (error) {
+        console.error("Error fetching usersAdded and usersRequested: ", error);
+      }
+    }
+  };
+
+  // Function to add a user to the usersAdded array and remove them from usersRequested
+  const addUserToAdded = async (user) => {
+    try {
+      const db = getFirestore();
+      const itineraryRef = doc(db, "itineraries", itineraryDocId);
+      const sharedItineraryRef = doc(db, "sharedItineraries", itineraryDocId);
+
+      // Check if the user is already in the usersAdded array
+      if (!usersAdded.includes(user)) {
+        // Update Firestore to add the user to the itinerary's "usersAdded" array
+        await updateDoc(itineraryRef, {
+          usersAdded: arrayUnion(user),
+        });
+
+        // Update Firestore to remove the user from the itinerary's "usersRequested" array
+        await updateDoc(itineraryRef, {
+          usersRequested: arrayRemove(user),
+        });
+
+        // Update the local state to reflect the changes
+        setUsersAdded([...usersAdded, user]);
+
+        // Call the removeUserFromRequested function to remove the user from usersRequested
+        removeUserFromRequested(user);
+
+        // Also update the shared itinerary document
+        await updateDoc(sharedItineraryRef, {
+          usersAdded: arrayUnion(user),
+        });
+      }
+    } catch (error) {
+      console.error("Error adding user to usersAdded: ", error);
+    }
+  };
+
+  // Function to remove a user from the usersRequested array
+  const removeUserFromRequested = async (user) => {
+    try {
+      const db = getFirestore();
+      const itineraryRef = doc(db, "itineraries", itineraryDocId);
+      const sharedItineraryRef = doc(db, "sharedItineraries", itineraryDocId);
+
+      // Update Firestore to remove the user from the itinerary's "usersRequested" array
+      await updateDoc(itineraryRef, {
+        usersRequested: arrayRemove(user),
+      });
+
+      // Update the local state to reflect the change
+      const updatedUsersRequested = usersRequested.filter(
+        (requestedUser) => requestedUser !== user
+      );
+      setUsersRequested(updatedUsersRequested);
+
+      // Also update the shared itinerary document
+      await updateDoc(sharedItineraryRef, {
+        usersRequested: arrayRemove(user),
+      });
+    } catch (error) {
+      console.error("Error removing user from usersRequested: ", error);
+    }
+  };
+
+  // Function to remove a user from the usersAdded array
+  const removeUserFromAdded = async (user) => {
+    const updatedUsersAdded = usersAdded.filter(
+      (addedUser) => addedUser !== user
+    );
+    setUsersAdded(updatedUsersAdded);
+
+    // Implement Firestore update logic to remove the user from the itinerary
+    const db = getFirestore();
+    const sharedItineraryRef = doc(db, "sharedItineraries", itineraryDocId);
+
+    try {
+      const sharedItinerarySnapshot = await getDoc(sharedItineraryRef);
+
+      if (sharedItinerarySnapshot.exists()) {
+        const sharedItineraryData = sharedItinerarySnapshot.data();
+        const updatedUsersAdded = sharedItineraryData.usersAdded.filter(
+          (addedUser) => addedUser !== user
+        );
+
+        // Update Firestore with the updated usersAdded array
+        await updateDoc(sharedItineraryRef, {
+          usersAdded: updatedUsersAdded,
+        });
+
+        console.log(`Removed ${user} from usersAdded`);
+      } else {
+        console.error("Shared itinerary document does not exist.");
+      }
+    } catch (error) {
+      console.error("Error removing user from usersAdded: ", error);
+    }
+  };
 
   const uploadOrCancelItinerary = async () => {
     try {
@@ -387,7 +552,7 @@ const ItineraryDetailsScreen = ({ route }) => {
             }}
           />
           <TouchableOpacity
-            style={styles.addButton}
+            style={styles.addButtonq}
             onPress={() => addNewActivity(index)}
           >
             {/* <Text style={styles.buttonText}>Add Activity</Text> */}
@@ -431,6 +596,9 @@ const ItineraryDetailsScreen = ({ route }) => {
                 color={isItineraryUploaded ? "red" : "#BCA5ED"}
               />
             </TouchableOpacity>
+            <TouchableOpacity style={styles.usersButton} onPress={toggleModal}>
+              <FontAwesome name="users" size={30} color="#357FEE" />
+            </TouchableOpacity>
           </View>
           <Text
             style={styles.duration}
@@ -444,6 +612,97 @@ const ItineraryDetailsScreen = ({ route }) => {
           />
         </View>
 
+        {/* Modal for displaying users */}
+        <Modal
+          animationType="slide"
+          transparent={true}
+          visible={isModalVisible}
+          onRequestClose={toggleModal}
+        >
+          <View style={styles.modalContainer}>
+            <View style={styles.modalContent}>
+              <SafeAreaView>
+                <SectionList
+                  sections={[
+                    {
+                      title: "Users Added",
+                      data: usersAdded,
+                    },
+                    {
+                      title: "Users Requested",
+                      data: usersRequested,
+                    },
+                  ]}
+                  keyExtractor={(item, index) => `${item}-${index}`}
+                  renderItem={({ item, section }) => (
+                    <View style={styles.userItem}>
+                      <Text style={styles.userName}>
+                        {section.title === "Users Added"
+                          ? usersAddedNames[item] || "Unknown User"
+                          : usersRequestedNames[item] || "Unknown User"}
+                      </Text>
+                      {section.title === "Users Requested" && (
+                        <>
+                          <TouchableOpacity
+                            style={styles.addButton}
+                            onPress={() => {
+                              addUserToAdded(item);
+                            }}
+                          >
+                            <FontAwesome
+                              name="plus-circle"
+                              size={20}
+                              color="#34C759"
+                            />
+                          </TouchableOpacity>
+                          {usersRequested.length > 0 && (
+                            <TouchableOpacity
+                              style={styles.removeButton}
+                              onPress={() => {
+                                removeUserFromRequested(item);
+                              }}
+                            >
+                              <FontAwesome
+                                name="minus-circle"
+                                size={20}
+                                color="#FF3B30"
+                              />
+                            </TouchableOpacity>
+                          )}
+                        </>
+                      )}
+                      {section.title === "Users Added" &&
+                        usersAdded.length > 0 && (
+                          <TouchableOpacity
+                            style={styles.removeButton}
+                            onPress={() => {
+                              removeUserFromAdded(item);
+                            }}
+                          >
+                            <FontAwesome
+                              name="minus-circle"
+                              size={20}
+                              color="#FF3B30"
+                            />
+                          </TouchableOpacity>
+                        )}
+                    </View>
+                  )}
+                  renderSectionHeader={({ section: { title, data } }) => (
+                    <Text style={styles.sectionHeader}>
+                      {title} ({data.length})
+                    </Text>
+                  )}
+                />
+
+                <Pressable onPress={toggleModal} style={styles.modalClose}>
+                  <FontAwesome name="times-circle" size={30} color="#888" />
+                </Pressable>
+              </SafeAreaView>
+            </View>
+          </View>
+        </Modal>
+
         <BottomNavigation style={styles.navigation} />
       </View>
     </TouchableWithoutFeedback>
@@ -451,7 +710,7 @@ const ItineraryDetailsScreen = ({ route }) => {
 };
 
 const styles = StyleSheet.create({
-  addButton: {
+  addButtonq: {
     backgroundColor: "transparent",
     padding: 10,
     borderRadius: 5,
@@ -500,14 +759,15 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     marginRight: windowWidth * 0.035,
-    marginTop: windowHeight * 0.01,
+    marginTop: windowHeight * 0.02,
+    marginLeft: windowWidth * 0.055,
   },
   backgroundContainer: {
     flex: 1,
   },
   destinationRow: {
     flexDirection: "row",
-    justifyContent: "space-between",
+    justifyContent: "flex-start",
     alignItems: "center",
     marginBottom: 10,
   },
@@ -626,6 +886,58 @@ const styles = StyleSheet.create({
     fontSize: windowWidth * 0.05,
     color: "white",
     textAlign: "center",
+  },
+
+  usersButton: {
+    backgroundColor: "transparent",
+    borderRadius: 5,
+    alignItems: "center",
+    justifyContent: "center",
+    marginTop: windowHeight * 0.01,
+  },
+
+  // Styles for the modal
+  modalContainer: {
+    flex: 1,
+    justifyContent: "flex-end",
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+  },
+  modalContent: {
+    backgroundColor: "#fff",
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    padding: 20,
+    maxHeight: windowHeight * 0.7,
+  },
+  userItem: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    borderBottomWidth: 1,
+    borderBottomColor: "#ddd",
+    paddingVertical: 10,
+    paddingRight: 5,
+    paddingLeft: 5,
+  },
+  userName: {
+    fontSize: 18,
+  },
+  addButton: {
+    padding: 5,
+    marginLeft: 10,
+  },
+  removeButton: {
+    padding: 5,
+  },
+  sectionHeader: {
+    fontSize: 20,
+    fontWeight: "bold",
+    marginTop: 20,
+  },
+  modalClose: {
+    position: "absolute",
+    top: 10,
+    right: 10,
   },
 });
 
