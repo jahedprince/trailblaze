@@ -217,6 +217,7 @@ const styles = StyleSheet.create({
     borderRadius: windowWidth * 0.05,
     backgroundColor: "#0a2e55",
     height: windowHeight * 0.125,
+    paddingTop: windowHeight * 0.008,
   },
 
   itineraryItemImage: {

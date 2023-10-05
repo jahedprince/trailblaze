@@ -307,7 +307,7 @@ const LoginComponent = () => {
             >
               <FontAwesome
                 name={showPassword ? "eye-slash" : "eye"}
-                size={19}
+                size={18}
                 color="#6C6C6C"
               />
             </TouchableOpacity>
@@ -400,6 +400,7 @@ const styles = StyleSheet.create({
   },
   inputIcon1: {
     marginTop: windowHeight * 0.015,
+    paddingBottom: 10,
     justifyContent: "center",
     alignItems: "center",
     flexDirection: "row",
@@ -425,10 +426,10 @@ const styles = StyleSheet.create({
   inputLabel2: {
     fontFamily: "Poppins-Medium",
     color: "#848484",
-    marginLeft: 10,
-    marginRight: 4,
+    marginLeft: windowWidth * 0.02,
+    marginRight: windowWidth * 0.02,
     fontSize: windowWidth * 0.045,
-    width: windowWidth * 0.52,
+    width: windowWidth * 0.51,
   },
   loginButtonContainer: {
     backgroundColor: "#00a3ff",
@@ -463,7 +464,6 @@ const styles = StyleSheet.create({
   },
   checkbox: {
     borderColor: "white", // Border color
-
     borderWidth: 1,
   },
 });
