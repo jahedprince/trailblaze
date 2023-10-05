@@ -15,9 +15,11 @@ import {
   onSnapshot,
   doc,
   getDoc,
+  query,
+  orderBy,
 } from "firebase/firestore";
 import { useNavigation } from "@react-navigation/native";
-
+import { Entypo } from "@expo/vector-icons";
 const windowWidth = Dimensions.get("window").width;
 const windowHeight = Dimensions.get("window").height;
 
@@ -35,7 +37,7 @@ const SocialPage = () => {
 
     // Subscribe to real-time updates
     const unsubscribe = onSnapshot(
-      sharedItinerariesCollection,
+      query(sharedItinerariesCollection, orderBy("dateAdded", "desc")),
       (querySnapshot) => {
         const itinerariesData = [];
         querySnapshot.forEach((doc) => {
@@ -135,11 +137,17 @@ const SocialPage = () => {
             key={itinerary.id}
           >
             <View style={styles.profile}>
-              <Image
-                style={styles.itineraryItemImage}
-                resizeMode="cover"
-                source={{ uri: userProfilePictures[itinerary.uid] }}
-              />
+              {userProfilePictures[itinerary.uid] ? (
+                // Render the user's profile picture if available
+                <Image
+                  style={styles.itineraryItemImage}
+                  resizeMode="cover"
+                  source={{ uri: userProfilePictures[itinerary.uid] }}
+                />
+              ) : (
+                // Render the user icon if no profile picture is available
+                <Entypo name="user" size={80} color="#757575" />
+              )}
               <Text style={styles.name}>{userNames[itinerary.uid]}</Text>
             </View>
 

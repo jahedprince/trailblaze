@@ -20,6 +20,7 @@ import {
   onSnapshot,
   updateDoc,
   arrayUnion,
+  arrayRemove,
 } from "firebase/firestore";
 import { getDoc } from "firebase/firestore";
 import { Entypo } from "@expo/vector-icons";
@@ -40,6 +41,7 @@ import { Feather } from "@expo/vector-icons";
 import { Ionicons } from "@expo/vector-icons";
 import { getAuth } from "firebase/auth";
 import { AntDesign } from "@expo/vector-icons";
+import { marginLeft } from "styled-system";
 
 const windowWidth = Dimensions.get("window").width;
 const windowHeight = Dimensions.get("window").height;
@@ -54,6 +56,7 @@ const SharedItineraryDetailsScreen = ({ route }) => {
     useState(userProfilePicture);
 
   const [userHasAccess, setUserHasAccess] = useState(false);
+  const [userHasRequested, setUserHasReuqested] = useState(false);
 
   useEffect(() => {
     const firebaseConfig = {
@@ -85,6 +88,10 @@ const SharedItineraryDetailsScreen = ({ route }) => {
 
           const hasAccess = sharedItinerary.usersAdded.includes(currentUserUid);
           setUserHasAccess(hasAccess);
+
+          const hasRequested =
+            sharedItinerary.usersRequested.includes(currentUserUid);
+          setUserHasReuqested(hasRequested);
         }
       }
     );
@@ -184,30 +191,6 @@ const SharedItineraryDetailsScreen = ({ route }) => {
         console.log("Original itinerary does not exist.");
       }
     };
-
-    // const handleRequestAccess = () => {
-    //   const auth = getAuth();
-    //   const currentUser = auth.currentUser;
-    //   const currentUserUid = currentUser.uid;
-
-    //   const updatedItinerary = { ...itineraryData };
-
-    //   if (!updatedItinerary.usersRequested.includes(currentUserUid)) {
-    //     updatedItinerary.usersRequested.push(currentUserUid);
-
-    //     const db = getFirestore();
-    //     const sharedItineraryRef = doc(
-    //       db,
-    //       "sharedItineraries",
-    //       sharedItineraryId
-    //     );
-
-    //     // Update Firestore with the updated usersRequested array
-    //     updateDoc(sharedItineraryRef, {
-    //       usersRequested: updatedItinerary.usersRequested,
-    //     });
-    //   }
-    // };
 
     const addNewActivity = (dayIndex) => {
       const newText = newActivityTexts[dayIndex]; // Get the text for the current day
@@ -407,7 +390,61 @@ const SharedItineraryDetailsScreen = ({ route }) => {
       // Show a message to the user indicating that the request was sent
       // You can use a toast, alert, or any other method to display the message
       // For example:
-      alert("Access request sent successfully!");
+      alert("Request to access has sent successfully!");
+    } catch (error) {
+      console.error("Error requesting access:", error);
+    }
+  };
+
+  const removeUserFromAdded = async () => {
+    try {
+      const auth = getAuth();
+      const currentUser = auth.currentUser;
+      const currentUserUid = currentUser.uid;
+
+      const db = getFirestore();
+      const sharedItineraryRef = doc(
+        db,
+        "sharedItineraries",
+        sharedItineraryId
+      );
+
+      // Add the current user's UID to the usersRequested array
+      await updateDoc(sharedItineraryRef, {
+        usersAdded: arrayRemove(currentUserUid),
+      });
+
+      // Show a message to the user indicating that the request was sent
+      // You can use a toast, alert, or any other method to display the message
+      // For example:
+      alert("Access removed successfully!");
+    } catch (error) {
+      console.error("Error requesting access:", error);
+    }
+  };
+
+  const removeUserFromRequested = async () => {
+    try {
+      const auth = getAuth();
+      const currentUser = auth.currentUser;
+      const currentUserUid = currentUser.uid;
+
+      const db = getFirestore();
+      const sharedItineraryRef = doc(
+        db,
+        "sharedItineraries",
+        sharedItineraryId
+      );
+
+      // Add the current user's UID to the usersRequested array
+      await updateDoc(sharedItineraryRef, {
+        usersRequested: arrayRemove(currentUserUid),
+      });
+
+      // Show a message to the user indicating that the request was sent
+      // You can use a toast, alert, or any other method to display the message
+      // For example:
+      alert("Request removed successfully!");
     } catch (error) {
       console.error("Error requesting access:", error);
     }
@@ -446,12 +483,29 @@ const SharedItineraryDetailsScreen = ({ route }) => {
                 <Text style={styles.destination}>
                   {itineraryData?.destination}
                 </Text>
-                {!userHasAccess && (
+                {!userHasAccess && !userHasRequested && (
                   <TouchableOpacity
                     style={styles.requestAccessButton}
                     onPress={handleRequestAccess}
                   >
                     <AntDesign name="addusergroup" size={30} color="white" />
+                  </TouchableOpacity>
+                )}
+                {!userHasAccess && userHasRequested && (
+                  <TouchableOpacity
+                    style={styles.trashButton}
+                    onPress={removeUserFromRequested}
+                  >
+                    <AntDesign name="clockcircleo" size={30} color="red" />
+                  </TouchableOpacity>
+                )}
+
+                {userHasAccess && (
+                  <TouchableOpacity
+                    style={styles.trashButton}
+                    onPress={removeUserFromAdded}
+                  >
+                    <AntDesign name="delete" size={30} color="red" />
                   </TouchableOpacity>
                 )}
               </View>
@@ -671,7 +725,14 @@ const styles = StyleSheet.create({
   requestAccessButton: {
     alignItems: "center",
     justifyContent: "center",
-    margin: 10, // Add some spacing
+    marginTop: 12,
+    marginLeft: 17,
+  },
+  trashButton: {
+    alignItems: "center",
+    justifyContent: "center",
+    marginTop: 12,
+    marginLeft: 17,
   },
 });
 

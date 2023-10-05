@@ -16,14 +16,21 @@ import Swipeout from "react-native-swipeout";
 import { FontAwesome5 } from "@expo/vector-icons";
 import { FontAwesome } from "@expo/vector-icons";
 import { Feather } from "@expo/vector-icons";
-import axios from "axios"; // Import Axios
+import axios from "axios";
 import { Ionicons } from "@expo/vector-icons";
+import { PIXABAY_API_KEY } from "@env";
 
-const PIXABAY_API_KEY = "39844341-8f9c395320873f546d921daf7"; // Replace with your Pixabay API key
+const PIXABAY_API_KEY1 = PIXABAY_API_KEY;
 
 const windowWidth = Dimensions.get("window").width;
 const windowHeight = Dimensions.get("window").height;
-const ItineraryItem = ({ item, onPress, onDelete, onEdit }) => {
+const ItineraryItem = ({
+  item,
+  onPress,
+  onDelete,
+  onEdit,
+  usersRequestedCount,
+}) => {
   const [isEditing, setIsEditing] = useState(false);
   const [newDestination, setNewDestination] = useState(item.destination);
   const [backgroundImage, setBackgroundImage] = useState(null);
@@ -104,7 +111,7 @@ const ItineraryItem = ({ item, onPress, onDelete, onEdit }) => {
     const fetchBackgroundImage = async () => {
       try {
         const response = await axios.get(
-          `https://pixabay.com/api/?key=${PIXABAY_API_KEY}&q=${encodeURIComponent(
+          `https://pixabay.com/api/?key=${PIXABAY_API_KEY1}&q=${encodeURIComponent(
             newDestination
           )}&image_type=photo&orientation=horizontal&safesearch=true` // Set safesearch to true
         );
@@ -163,6 +170,11 @@ const ItineraryItem = ({ item, onPress, onDelete, onEdit }) => {
                 </Text>
               )}
             </TouchableOpacity>
+            {usersRequestedCount > 0 && ( // Conditionally render the badge
+              <View style={styles.badge}>
+                <Text style={styles.badgeText}>{usersRequestedCount}</Text>
+              </View>
+            )}
           </View>
           <Text
             style={styles.duration}
@@ -232,6 +244,23 @@ const styles = StyleSheet.create({
     textAlign: "center",
     paddingTop: windowHeight * 0.02,
     fontFamily: "Overpass-Medium",
+  },
+  badge: {
+    position: "absolute",
+    top: windowHeight * 0.015,
+    right: windowWidth * 0,
+    backgroundColor: "red", // Color for your badge
+    borderRadius: 10,
+    width: 20, // Adjust as needed
+    height: 20, // Adjust as needed
+    alignItems: "center",
+    justifyContent: "center",
+  },
+
+  badgeText: {
+    color: "white", // Color for your badge text
+    fontSize: 12, // Adjust as needed
+    fontWeight: "bold",
   },
 });
 

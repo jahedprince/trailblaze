@@ -49,6 +49,7 @@ const HomeScreen = () => {
   }-${currentDate.getDate()}`;
 
   const [itineraries, setItineraries] = useState([]);
+  const [itineraryCounts, setItineraryCounts] = useState({});
   // const userData = route.params?.userData; // Get user data passed from Login screen
   const { userData } = useUser(); // Get the userData from the context
 
@@ -67,18 +68,83 @@ const HomeScreen = () => {
     // const { uid } = route.params;
 
     const itinerariesCollection = collection(db, "itineraries");
+    const sharedItinerariesCollection = collection(db, "sharedItineraries"); // Assuming this is the correct collection name
 
     const unsubscribe = onSnapshot(itinerariesCollection, (querySnapshot) => {
       const userItineraries = querySnapshot.docs
         .map((doc) => ({ id: doc.id, ...doc.data() }))
         .filter((itinerary) => itinerary.uid === userData.uid); // Filter itineraries by user's uid
+
+      // Create a promise for each itinerary to fetch the count of usersRequested
+      const promises = userItineraries.map(async (itinerary) => {
+        // Check if the same itinerary exists in the sharedItineraries collection
+        const sharedItineraryDocRef = doc(
+          sharedItinerariesCollection,
+          itinerary.id
+        );
+        const sharedItineraryDoc = await getDoc(sharedItineraryDocRef);
+
+        if (sharedItineraryDoc.exists()) {
+          // Calculate the count of usersRequested based on the sharedItineraries document
+          const usersRequestedCount =
+            sharedItineraryDoc.data().usersRequested.length;
+
+          return { id: itinerary.id, usersRequestedCount };
+        } else {
+          return { id: itinerary.id, usersRequestedCount: 0 };
+        }
+      });
+
+      // Use Promise.all to wait for all counts to be fetched
+      Promise.all(promises).then((counts) => {
+        const countsObj = counts.reduce((acc, curr) => {
+          acc[curr.id] = curr.usersRequestedCount;
+          return acc;
+        }, {});
+
+        // Update the itineraryCounts state variable
+        setItineraryCounts(countsObj);
+      });
+
+      // Set the itineraries state variable as before
       setItineraries(userItineraries);
+    });
+
+    // Create a promise for each itinerary to fetch the count of usersRequested
+    const promises = itineraries.map(async (itinerary) => {
+      // Check if the same itinerary exists in the sharedItineraries collection
+      const sharedItineraryDocRef = doc(
+        sharedItinerariesCollection,
+        itinerary.id
+      );
+      const sharedItineraryDoc = await getDoc(sharedItineraryDocRef);
+
+      if (sharedItineraryDoc.exists()) {
+        // Calculate the count of usersRequested based on the sharedItineraries document
+        const usersRequestedCount =
+          sharedItineraryDoc.data().usersRequested.length;
+
+        return { id: itinerary.id, usersRequestedCount };
+      } else {
+        return { id: itinerary.id, usersRequestedCount: 0 };
+      }
+    });
+
+    // Use Promise.all to wait for all counts to be fetched
+    Promise.all(promises).then((counts) => {
+      const countsObj = counts.reduce((acc, curr) => {
+        acc[curr.id] = curr.usersRequestedCount;
+        return acc;
+      }, {});
+
+      // Update the itineraryCounts state variable
+      setItineraryCounts(countsObj);
     });
 
     return () => {
       unsubscribe();
     };
-  }, [userData]);
+  }, [userData, itineraries]);
 
   const firstName = userData.name.split(" ")[0];
 
@@ -186,6 +252,7 @@ const HomeScreen = () => {
       }
       onDelete={() => deleteItinerary(item.id)}
       onEdit={(newDestination) => editItinerary(item.id, newDestination)}
+      usersRequestedCount={itineraryCounts[item.id] || 0}
     />
   );
 

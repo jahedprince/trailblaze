@@ -375,7 +375,7 @@ const MyProfile = () => {
       const timestamp = fileName.split("_")[1].split(".")[0];
 
       // Construct the correct storage path
-      const storagePath = `profilePictures/${userId}/${userId}_${timestamp}.jpg`;
+      const storagePath = `profilePictures/${userId}/${userId}_${timestamp}_500x500.jpg`;
 
       // Delete the profile picture file from Firebase Storage
       const storageRef = ref(storage, storagePath);

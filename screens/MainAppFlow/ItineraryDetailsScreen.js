@@ -54,6 +54,7 @@ const windowWidth = Dimensions.get("window").width;
 const windowHeight = Dimensions.get("window").height;
 
 const ItineraryDetailsScreen = ({ route }) => {
+  const currentDate = new Date();
   const { itinerary } = route.params;
   const [editingActivity, setEditingActivity] = useState(null);
   const [itineraryData, setItineraryData] = useState(itinerary);
@@ -306,6 +307,9 @@ const ItineraryDetailsScreen = ({ route }) => {
           duration: itinerary.duration,
           uid: itinerary.uid,
           days: itinerary.days,
+          usersAdded: [itinerary.uid], // Initialize "usersAdded" as an empty array
+          usersRequested: [],
+          dateAdded: currentDate,
           // Add any other relevant data here
         });
 
@@ -331,6 +335,9 @@ const ItineraryDetailsScreen = ({ route }) => {
         uid: itinerary.uid,
         days: itinerary.days,
         // Add any other relevant data here
+        usersAdded: [itinerary.uid], // Initialize "usersAdded" as an empty array
+        usersRequested: [],
+        dateAdded: currentDate,
       });
 
       // The new itinerary has been uploaded
@@ -893,51 +900,55 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     alignItems: "center",
     justifyContent: "center",
-    marginTop: windowHeight * 0.01,
+    marginTop: windowHeight * 0.015,
   },
 
   // Styles for the modal
   modalContainer: {
     flex: 1,
     justifyContent: "flex-end",
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    backgroundColor: "rgba(0, 0, 0, 0.7)",
   },
   modalContent: {
-    backgroundColor: "#fff",
+    backgroundColor: "#D8D8D8",
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
-    padding: 20,
+    paddingTop: windowWidth * 0.035,
+    paddingLeft: windowWidth * 0.035,
+    paddingRight: windowWidth * 0.035,
+    paddingBottom: windowHeight * 0.05,
     maxHeight: windowHeight * 0.7,
   },
   userItem: {
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "space-between",
+    justifyContent: "flex-start",
     borderBottomWidth: 1,
-    borderBottomColor: "#ddd",
+    borderBottomColor: "#757575",
     paddingVertical: 10,
-    paddingRight: 5,
-    paddingLeft: 5,
+    paddingRight: windowWidth * 0.02,
   },
   userName: {
-    fontSize: 18,
+    fontSize: windowWidth * 0.045,
+    textTransform: "uppercase",
+    fontFamily: "Overpass-SemiBold",
   },
   addButton: {
-    padding: 5,
-    marginLeft: 10,
+    padding: windowWidth * 0.01,
+    marginLeft: windowWidth * 0.01,
   },
   removeButton: {
-    padding: 5,
+    padding: windowWidth * 0.01,
   },
   sectionHeader: {
-    fontSize: 20,
-    fontWeight: "bold",
-    marginTop: 20,
+    fontSize: windowWidth * 0.05,
+    fontFamily: "Overpass-Bold",
+    marginTop: windowHeight * 0.015,
   },
   modalClose: {
     position: "absolute",
-    top: 10,
-    right: 10,
+    top: windowHeight * 0.01,
+    right: windowHeight * 0.01,
   },
 });
 
