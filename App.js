@@ -21,6 +21,8 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { UserProvider } from "./Providers/UserContext";
 import SignIn from "./screens/SignIn";
 import SignUp from "./screens/SignUp";
+import SocialPage from "./screens/SocialPage";
+import SharedItineraryDetailsScreen from "./screens/SharedItineraryDetailsScreen";
 import {
   FIREBASE_API_KEY,
   FIREBASE_AUTH_DOMAIN,
@@ -78,7 +80,16 @@ const App = () => {
                 component={HomeScreen}
                 options={{ headerShown: false }}
               />
-
+              <Stack.Screen
+                name="Social"
+                component={SocialPage}
+                options={{ headerShown: false }}
+              />
+              <Stack.Screen
+                name="SharedItineraryDetails"
+                component={SharedItineraryDetailsScreen}
+                options={{ headerShown: false }}
+              />
               <Stack.Screen
                 name="ItineraryDetails"
                 component={ItineraryDetailsScreen}
@@ -112,6 +123,16 @@ const App = () => {
               <Stack.Screen
                 name="ItineraryDetails"
                 component={ItineraryDetailsScreen}
+              />
+              <Stack.Screen
+                name="Social"
+                component={SocialPage}
+                options={{ headerShown: false }}
+              />
+              <Stack.Screen
+                name="SharedItineraryDetails"
+                component={SharedItineraryDetailsScreen}
+                options={{ headerShown: false }}
               />
               <Stack.Screen name="Chat" component={ChatScreen} />
               <Stack.Screen name="Profile" component={MyProfile} />

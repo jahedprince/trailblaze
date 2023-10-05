@@ -25,6 +25,13 @@ const BottomNavigation = () => {
       </TouchableOpacity>
       <TouchableOpacity
         style={styles.button}
+        onPress={() => navigation.navigate("Social")}
+      >
+        <Icon name="location-sharp" size={30} color="rgba(245, 98, 98,1)" />
+        <Text style={styles.buttonText}>Feed</Text>
+      </TouchableOpacity>
+      <TouchableOpacity
+        style={styles.button}
         onPress={() => navigation.navigate("Profile")}
       >
         <Icon name="person" size={30} color="rgba(188, 165, 237, 1)" />
@@ -40,7 +47,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-around",
     alignItems: "center",
     paddingTop: 5, // Add space at the top
-    paddingBottom: 5, // Remove extra space at the bottom
+    paddingBottom: 20, // Remove extra space at the bottom
     backgroundColor: "black",
   },
   button: {

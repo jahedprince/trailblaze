@@ -11,7 +11,7 @@ import {
   Dimensions,
   TouchableWithoutFeedback,
 } from "react-native";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation } from "@react-navigation/native"; // Import useNavigation
 import { useRoute } from "@react-navigation/native";
 import { initializeApp } from "firebase/app";
 
@@ -33,6 +33,7 @@ import {
   doc,
   setDoc,
   deleteDoc,
+  getDoc,
 } from "firebase/firestore";
 import { useUser } from "../../Providers/UserContext"; // Update the import path to match your project structure
 
@@ -40,7 +41,7 @@ const windowWidth = Dimensions.get("window").width;
 const windowHeight = Dimensions.get("window").height;
 
 const HomeScreen = () => {
-  const navigation = useNavigation();
+  const navigation = useNavigation(); // Use the useNavigation hook
   const route = useRoute();
   const currentDate = new Date();
   const formattedDate = `${currentDate.getFullYear()}-${
@@ -97,6 +98,59 @@ const HomeScreen = () => {
     }
   };
 
+  const updateDestinationNameInFirestore = async (
+    itineraryId,
+    newDestinationName
+  ) => {
+    try {
+      const db = getFirestore();
+      const itineraryRef = doc(db, "itineraries", itineraryId);
+
+      // Update the destination name in the "itineraries" collection
+      await setDoc(
+        itineraryRef,
+        { destination: newDestinationName },
+        { merge: true }
+      );
+
+      // Check if the shared itinerary document exists before updating it
+      const sharedItineraryExists = await checkSharedItineraryExists(
+        itineraryId
+      );
+
+      if (sharedItineraryExists) {
+        // Update the destination name in the "sharedItineraries" collection
+        const sharedItineraryRef = doc(db, "sharedItineraries", itineraryId);
+        await setDoc(
+          sharedItineraryRef,
+          { destination: newDestinationName },
+          { merge: true }
+        );
+      } else {
+        console.log("Shared itinerary does not exist.");
+      }
+
+      // Update the state with the new destination name
+      setItineraries((prevItineraries) =>
+        prevItineraries.map((item) =>
+          item.id === itineraryId
+            ? { ...item, destination: newDestinationName }
+            : item
+        )
+      );
+    } catch (error) {
+      console.error("Error updating destination name:", error);
+    }
+  };
+
+  const checkSharedItineraryExists = async (itineraryDocId) => {
+    const db = getFirestore();
+    const sharedItineraryRef = doc(db, "sharedItineraries", itineraryDocId);
+
+    const docSnapshot = await getDoc(sharedItineraryRef);
+    return docSnapshot.exists();
+  };
+
   const editItinerary = async (itineraryId, newDestination) => {
     try {
       const db = getFirestore(); // Get Firestore instance
@@ -117,10 +171,13 @@ const HomeScreen = () => {
             : item
         )
       );
+
+      updateDestinationNameInFirestore(itineraryId, newDestination);
     } catch (error) {
       console.error("Error editing itinerary:", error);
     }
   };
+
   const renderItineraryItem = ({ item }) => (
     <ItineraryItem
       item={item}

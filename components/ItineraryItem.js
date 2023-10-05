@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -8,16 +8,26 @@ import {
   Modal,
   Button,
   StyleSheet,
+  ImageBackground,
+  Dimensions,
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import Swipeout from "react-native-swipeout";
 import { FontAwesome5 } from "@expo/vector-icons";
 import { FontAwesome } from "@expo/vector-icons";
 import { Feather } from "@expo/vector-icons";
+import axios from "axios"; // Import Axios
+import { Ionicons } from "@expo/vector-icons";
 
+const PIXABAY_API_KEY = "39844341-8f9c395320873f546d921daf7"; // Replace with your Pixabay API key
+
+const windowWidth = Dimensions.get("window").width;
+const windowHeight = Dimensions.get("window").height;
 const ItineraryItem = ({ item, onPress, onDelete, onEdit }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [newDestination, setNewDestination] = useState(item.destination);
+  const [backgroundImage, setBackgroundImage] = useState(null);
+
   // Function to capitalize the first letter
   const capitalizeFirstLetter = (text) => {
     const words = text.split(" ");
@@ -53,13 +63,12 @@ const ItineraryItem = ({ item, onPress, onDelete, onEdit }) => {
         <View
           style={{
             backgroundColor: "#E92B2B",
-            borderRadius: 25, // Set the borderRadius here
+            borderRadius: 25,
             flex: 1,
             justifyContent: "center",
             alignItems: "center",
             marginBottom: 15,
           }}
-          // onPress={() => onDelete(item.id)}
         >
           <FontAwesome name="trash" size={30} color="white" />
         </View>
@@ -74,14 +83,13 @@ const ItineraryItem = ({ item, onPress, onDelete, onEdit }) => {
         <View
           style={{
             backgroundColor: "#357FEE",
-            borderRadius: 25, // Set the borderRadius here
+            borderRadius: 25,
             flex: 1,
             justifyContent: "center",
             alignItems: "center",
             marginBottom: 18,
             paddingTop: 5,
           }}
-          // onPress={startEditing}
         >
           <Feather name="edit" size={28} color="white" />
         </View>
@@ -91,6 +99,33 @@ const ItineraryItem = ({ item, onPress, onDelete, onEdit }) => {
     },
   ];
 
+  // Fetch the background image from Pixabay based on the destination name
+  useEffect(() => {
+    const fetchBackgroundImage = async () => {
+      try {
+        const response = await axios.get(
+          `https://pixabay.com/api/?key=${PIXABAY_API_KEY}&q=${encodeURIComponent(
+            newDestination
+          )}&image_type=photo&orientation=horizontal&safesearch=true` // Set safesearch to true
+        );
+
+        if (response.data.hits.length > 0) {
+          const imageUrl = response.data.hits[0].largeImageURL;
+          setBackgroundImage({ uri: imageUrl });
+        } else {
+          // Fallback to a default background image if no result is found
+          setBackgroundImage("");
+        }
+      } catch (error) {
+        console.error("Error fetching background image:", error);
+        // Fallback to a default background image in case of an error
+        setBackgroundImage("");
+      }
+    };
+
+    fetchBackgroundImage();
+  }, [newDestination]);
+
   return (
     <Swipeout
       right={swipeoutBtns}
@@ -98,14 +133,17 @@ const ItineraryItem = ({ item, onPress, onDelete, onEdit }) => {
       backgroundColor="transparent"
     >
       <TouchableOpacity style={styles.itineraryItem} onPress={onPress}>
-        <LinearGradient
-          colors={["rgba(7, 54, 63, 1)", "rgba(10, 46, 53, 1)"]}
+        <ImageBackground
+          source={backgroundImage}
           style={styles.linearGradient}
+          imageStyle={{ opacity: 0.6 }}
         >
           <View style={styles.iconAndHeader}>
-            <Image
+            <Ionicons
+              name="ios-location-sharp"
+              size={30}
+              color="rgba(255,255,255,0.7)"
               style={styles.locationFilledIcon}
-              source={require("../assets/location-filled.png")}
             />
             <TouchableOpacity
               onPress={onDestinationPress}
@@ -117,7 +155,7 @@ const ItineraryItem = ({ item, onPress, onDelete, onEdit }) => {
                   value={newDestination}
                   onChangeText={(text) => setNewDestination(text)}
                   onBlur={saveEdit}
-                  autoFocus // Automatically focus on input when in edit mode
+                  autoFocus
                 />
               ) : (
                 <Text style={styles.destinationText}>
@@ -130,12 +168,11 @@ const ItineraryItem = ({ item, onPress, onDelete, onEdit }) => {
             style={styles.duration}
           >{`Duration: ${item.duration} days`}</Text>
           <Text style={styles.viewDetails}>View Details</Text>
-        </LinearGradient>
+        </ImageBackground>
       </TouchableOpacity>
     </Swipeout>
   );
 };
-
 const styles = StyleSheet.create({
   iconAndHeader: {
     flexDirection: "row",
@@ -143,61 +180,57 @@ const styles = StyleSheet.create({
     marginBottom: 5,
   },
   itineraryItem: {
-    marginBottom: 15,
+    marginBottom: windowWidth * 0.04,
     borderRadius: 25,
     overflow: "hidden",
   },
   linearGradient: {
     paddingTop: 0,
-    paddingBottom: 10,
-    paddingLeft: 20,
-    paddingRight: 20,
+    paddingBottom: windowHeight * 0.01,
+    paddingLeft: windowWidth * 0.04,
+    paddingRight: windowWidth * 0.04,
+    resizeMode: "cover",
+    backgroundColor: "#07363F",
   },
   editableDestinationContainer: {
-    flex: 1, // Take up available space
+    flex: 1,
   },
   editableDestination: {
-    fontSize: 35,
-    fontWeight: "700",
+    fontSize: windowWidth * 0.085,
     fontFamily: "Overpass-Bold",
-    marginTop: 10,
-    paddingTop: 10,
-    paddingBottom: 10,
+    marginTop: windowHeight * 0.01,
+    paddingTop: windowWidth * 0.02,
+    paddingBottom: windowWidth * 0.01,
     paddingLeft: 0,
-    paddingRight: 10,
+    paddingRight: windowWidth * 0.01,
     color: "rgba(34, 221, 133, 1)",
   },
   destinationText: {
-    fontSize: 35,
-    fontWeight: "700",
+    fontSize: windowWidth * 0.085,
     fontFamily: "Overpass-Bold",
-    marginTop: 10,
-    paddingTop: 10,
-    paddingBottom: 6,
+    marginTop: windowHeight * 0.01,
+    paddingTop: windowWidth * 0.02,
+    paddingBottom: windowWidth * 0.01,
     paddingLeft: 0,
-    paddingRight: 10,
+    paddingRight: windowWidth * 0.01,
     color: "rgba(34, 221, 133, 1)",
   },
   duration: {
-    fontSize: 22,
+    fontSize: windowWidth * 0.055,
     fontWeight: "500",
-    height: 26,
-    width: 215,
     color: "rgba(255, 255, 255, 1)",
     fontFamily: "Overpass-SemiBold",
+    marginLeft: windowWidth * 0.01,
   },
   locationFilledIcon: {
-    width: 30,
-    height: 33,
     marginBottom: -5,
-    marginRight: 3,
   },
   viewDetails: {
-    fontSize: 20,
+    fontSize: windowWidth * 0.045,
     fontWeight: "bold",
-    color: "rgba(255, 255, 255, 0.5)",
+    color: "rgba(255, 255, 255, 0.7)",
     textAlign: "center",
-    paddingTop: 20,
+    paddingTop: windowHeight * 0.02,
     fontFamily: "Overpass-Medium",
   },
 });

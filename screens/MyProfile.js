@@ -311,17 +311,20 @@ const MyProfile = () => {
         // Get the download URL of the uploaded image
         const downloadURL = await getDownloadURL(snapshot.ref);
 
+        // Modify the downloadURL
+        const modifiedURL = downloadURL.replace(".jpg", "_500x500.jpg");
+
         // Update the profile picture URL in Firestore
         const userDocRef = doc(db, "users", userId);
         await updateDoc(userDocRef, {
-          profilePictureUrl: downloadURL,
+          profilePictureUrl: modifiedURL,
         });
 
         // Remove the cached profile picture URL
         await AsyncStorage.removeItem("profilePictureUrl");
 
         // Set the profile picture URL in the component state
-        setProfilePictureUrl(downloadURL);
+        setProfilePictureUrl(modifiedURL);
 
         // Set isLoadingImage to false once the image is successfully uploaded
         setLoadingImage(false);
