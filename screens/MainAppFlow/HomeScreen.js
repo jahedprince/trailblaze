@@ -408,15 +408,16 @@ const styles = StyleSheet.create({
   },
   itineraryContainer: {
     flex: 1, // Let this container take up all available space
-    top: windowHeight * 0.22, // Adjust this value as needed
+    top: windowHeight * 0.21, // Adjust this value as needed
     left: 0,
     right: 0,
-    bottom: 0, // Ensure it stretches to the bottom
+    bottom: windowHeight * 0.035, // Ensure it stretches to the bottom
+
     position: "absolute",
   },
   itineraryList: {
     padding: 15,
-    marginBottom: windowHeight * 0.07, // Height of the BottomNavigation
+    marginBottom: windowHeight * 0.06, // Height of the BottomNavigation
   },
   navigation: {
     position: "absolute",

@@ -6,6 +6,7 @@ import {
   Image,
   TouchableOpacity,
   Dimensions,
+  ScrollView,
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import BottomNavigation from "../components/BottomNavigation";
@@ -124,44 +125,46 @@ const SocialPage = () => {
 
       <View style={styles.itineraryContainer}>
         <Text style={styles.title}>Shared Itineraries:</Text>
-        {sharedItineraries.map((itinerary) => (
-          <TouchableOpacity
-            style={styles.itineraryItem}
-            onPress={() => {
-              // Navigate to SharedItineraryDetailsScreen with the sharedItineraryId
-              navigation.navigate("SharedItineraryDetails", {
-                sharedItineraryId: itinerary.id,
-                userProfilePicture: userProfilePictures[itinerary.uid],
-              });
-            }}
-            key={itinerary.id}
-          >
-            <View style={styles.profile}>
-              {userProfilePictures[itinerary.uid] ? (
-                // Render the user's profile picture if available
-                <Image
-                  style={styles.itineraryItemImage}
-                  resizeMode="cover"
-                  source={{ uri: userProfilePictures[itinerary.uid] }}
-                />
-              ) : (
-                // Render the user icon if no profile picture is available
-                <Entypo name="user" size={80} color="#757575" />
-              )}
-              <Text style={styles.name}>{userNames[itinerary.uid]}</Text>
-            </View>
+        <ScrollView style={styles.itineraryContainer1}>
+          {sharedItineraries.map((itinerary) => (
+            <TouchableOpacity
+              style={styles.itineraryItem}
+              onPress={() => {
+                // Navigate to SharedItineraryDetailsScreen with the sharedItineraryId
+                navigation.navigate("SharedItineraryDetails", {
+                  sharedItineraryId: itinerary.id,
+                  userProfilePicture: userProfilePictures[itinerary.uid],
+                });
+              }}
+              key={itinerary.id}
+            >
+              <View style={styles.profile}>
+                {userProfilePictures[itinerary.uid] ? (
+                  // Render the user's profile picture if available
+                  <Image
+                    style={styles.itineraryItemImage}
+                    resizeMode="cover"
+                    source={{ uri: userProfilePictures[itinerary.uid] }}
+                  />
+                ) : (
+                  // Render the user icon if no profile picture is available
+                  <Entypo name="user" size={80} color="#757575" />
+                )}
+                <Text style={styles.name}>{userNames[itinerary.uid]}</Text>
+              </View>
 
-            <View style={styles.itineraryItemDetails}>
-              <Text style={styles.itineraryItemTitle}>
-                {itinerary.destination}
-              </Text>
-              <Text style={styles.itineraryItemSubtitle}>
-                Duration: {itinerary.duration} days
-              </Text>
-            </View>
-            {/* You can add an icon or button here for "View Details" */}
-          </TouchableOpacity>
-        ))}
+              <View style={styles.itineraryItemDetails}>
+                <Text style={styles.itineraryItemTitle}>
+                  {itinerary.destination}
+                </Text>
+                <Text style={styles.itineraryItemSubtitle}>
+                  Duration: {itinerary.duration} days
+                </Text>
+              </View>
+              {/* You can add an icon or button here for "View Details" */}
+            </TouchableOpacity>
+          ))}
+        </ScrollView>
       </View>
       <BottomNavigation style={styles.navigation} />
     </View>
@@ -269,6 +272,16 @@ const styles = StyleSheet.create({
   hello: {
     top: windowHeight * 0.065,
     left: windowWidth * 0.01,
+    position: "absolute",
+  },
+
+  itineraryContainer1: {
+    flex: 1, // Let this container take up all available space
+    top: windowHeight * 0.05, // Adjust this value as needed
+    left: 0,
+    right: 0,
+    bottom: windowHeight * 0.09, // Ensure it stretches to the bottom
+
     position: "absolute",
   },
 });
