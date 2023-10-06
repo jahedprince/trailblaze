@@ -46,7 +46,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-around",
     alignItems: "center",
-    paddingTop: 3, // Add space at the top
+    paddingTop: 4, // Add space at the top
     paddingBottom: 20, // Remove extra space at the bottom
     backgroundColor: "black",
   },
