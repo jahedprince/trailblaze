@@ -12,13 +12,13 @@
       "backgroundColor": "#ffffff"
     },
     "platforms": ["ios", "android"],
-    "supportsTablet": false,
+
     "assetBundlePatterns": ["**/*"],
     "ios": {
       "supportsTablet": false,
       "bundleIdentifier": "com.jahedprince.TrailBlaze",
       "buildNumber": "2.0.0",
-      "supportedDevices": ["iPhone"],
+
       "infoPlist": {
         "NSFaceIDUsageDescription": "Allow Trail-Blaze to use Touch ID or Face ID to make logging in smooth.",
         "NSPhotoLibraryUsageDescription": "Allow Trail-Blaze to access your photos to upload new profile pcitures."
