@@ -56,6 +56,7 @@ const ChatScreen = () => {
   const [messages, setMessages] = useState([]);
   const { userData } = useUser();
   const [isKeyboardVisible, setKeyboardVisible] = useState(false);
+  const [isGeneratingItinerary, setIsGeneratingItinerary] = useState(false);
 
   const apiKey = FIREBASE_API_KEY2;
 
@@ -65,6 +66,7 @@ const ChatScreen = () => {
   const handleSend = async (newMessages = []) => {
     try {
       //get user message
+      setIsGeneratingItinerary(true);
       const userMessage = newMessages[0];
 
       //add the user's message to the messages state
@@ -140,6 +142,8 @@ const ChatScreen = () => {
         duration,
         apiKey
       );
+
+      setIsGeneratingItinerary(false);
 
       const botMessage = {
         _id: `bot-${new Date().getTime()}`,
@@ -219,6 +223,7 @@ const ChatScreen = () => {
         },
       ]);
     } catch (error) {
+      setIsGeneratingItinerary(false);
       console.log(error);
     }
   };
@@ -255,100 +260,108 @@ const ChatScreen = () => {
           />
         </View>
       </View>
-      <GiftedChat
-        messages={messages}
-        onSend={(newMessages) => handleSend(newMessages)}
-        user={{
-          _id: 1,
-        }}
-        renderSend={(props) => {
-          const { text, user, onSend } = props;
-          return (
-            <TouchableOpacity
-              onPress={() => {
-                if (text && onSend) {
-                  onSend(
-                    {
-                      text: text.trim(),
-                      user: user,
-                    },
-                    true
-                  );
-                }
+      {isGeneratingItinerary ? (
+        <View style={styles.generating}>
+          <Text style={styles.generatingText}>
+            Generating itinerary, please wait...
+          </Text>
+        </View>
+      ) : (
+        <GiftedChat
+          messages={messages}
+          onSend={(newMessages) => handleSend(newMessages)}
+          user={{
+            _id: 1,
+          }}
+          renderSend={(props) => {
+            const { text, user, onSend } = props;
+            return (
+              <TouchableOpacity
+                onPress={() => {
+                  if (text && onSend) {
+                    onSend(
+                      {
+                        text: text.trim(),
+                        user: user,
+                      },
+                      true
+                    );
+                  }
+                }}
+                style={styles.customSend}
+              >
+                <Ionicons name="ios-send-sharp" size={30} color="#22DD85" />
+              </TouchableOpacity>
+            );
+          }}
+          renderInputToolbar={(props) => (
+            <InputToolbar
+              {...props}
+              containerStyle={{
+                backgroundColor: "#2E2E2E",
+                borderTopColor: "#2E2E2E",
+                borderRadius: 10,
               }}
-              style={styles.customSend}
-            >
-              <Ionicons name="ios-send-sharp" size={30} color="#22DD85" />
-            </TouchableOpacity>
-          );
-        }}
-        renderInputToolbar={(props) => (
-          <InputToolbar
-            {...props}
-            containerStyle={{
-              backgroundColor: "#2E2E2E",
-              borderTopColor: "#2E2E2E",
-              borderRadius: 10,
-            }}
-          />
-        )}
-        renderTime={(props) => (
-          <Time
-            {...props}
-            timeTextStyle={{
-              left: {
-                color: "black",
-              },
-              right: {
+            />
+          )}
+          renderTime={(props) => (
+            <Time
+              {...props}
+              timeTextStyle={{
+                left: {
+                  color: "black",
+                },
+                right: {
+                  color: "white",
+                },
+              }}
+            />
+          )}
+          renderComposer={(props) => (
+            <Composer
+              {...props}
+              textInputStyle={{
+                backgroundColor: "#555555",
+                borderRadius: 5,
                 color: "white",
-              },
-            }}
-          />
-        )}
-        renderComposer={(props) => (
-          <Composer
-            {...props}
-            textInputStyle={{
-              backgroundColor: "#555555",
-              borderRadius: 5,
-              color: "white",
-              paddingTop: 10,
-              paddingLeft: 10,
-              marginRight: 10,
-            }}
-            placeholder={`"Travel to ______ for __ days..."`}
-          />
-        )}
-        const
-        renderBubble={(props) => (
-          <Bubble
-            {...props}
-            wrapperStyle={{
-              right: {
-                borderRadius: 10,
-                backgroundColor: "#07363F",
-              },
-              left: {
-                borderRadius: 10,
-                backgroundColor: "#707070",
-              },
-            }}
-            containerToPreviousStyle={{
-              right: { borderRadius: 10 },
-              left: { borderRadius: 10 },
-            }}
-            containerToNextStyle={{
-              right: { borderRadius: 10 },
-              left: { borderRadius: 10 },
-            }}
-            containerStyle={{
-              right: { borderRadius: 10 },
-              left: { borderRadius: 10 },
-            }}
-          />
-        )}
-        renderAvatar={() => null}
-      />
+                paddingTop: 10,
+                paddingLeft: 10,
+                marginRight: 10,
+              }}
+              placeholder={`"Travel to ______ for __ days..."`}
+            />
+          )}
+          const
+          renderBubble={(props) => (
+            <Bubble
+              {...props}
+              wrapperStyle={{
+                right: {
+                  borderRadius: 10,
+                  backgroundColor: "#07363F",
+                },
+                left: {
+                  borderRadius: 10,
+                  backgroundColor: "#707070",
+                },
+              }}
+              containerToPreviousStyle={{
+                right: { borderRadius: 10 },
+                left: { borderRadius: 10 },
+              }}
+              containerToNextStyle={{
+                right: { borderRadius: 10 },
+                left: { borderRadius: 10 },
+              }}
+              containerStyle={{
+                right: { borderRadius: 10 },
+                left: { borderRadius: 10 },
+              }}
+            />
+          )}
+          renderAvatar={() => null}
+        />
+      )}
       {!isKeyboardVisible && <BottomNavigation />}
     </View>
   );
@@ -361,6 +374,18 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 0,
     backgroundColor: "black",
+  },
+  generating: {
+    flex: 1,
+    backgroundColor: "black",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  generatingText: {
+    color: "white",
+    textAlign: "center",
+    fontFamily: "Poppins-Medium",
+    fontSize: windowWidth * 0.045,
   },
   backgroundContainer: {
     flex: 0.18,
