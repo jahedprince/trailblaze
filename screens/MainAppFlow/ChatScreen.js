@@ -66,7 +66,7 @@ const ChatScreen = () => {
   const handleSend = async (newMessages = []) => {
     try {
       //get user message
-      setIsGeneratingItinerary(true);
+
       const userMessage = newMessages[0];
 
       //add the user's message to the messages state
@@ -135,6 +135,8 @@ const ChatScreen = () => {
         );
         return;
       }
+
+      setIsGeneratingItinerary(true);
 
       // Use OpenAI API to generate a response for travel itinerary
       const itinerary = await createTravelItinerary(
@@ -342,7 +344,7 @@ const ChatScreen = () => {
                 },
                 left: {
                   borderRadius: 10,
-                  backgroundColor: "#707070",
+                  backgroundColor: "#ccc",
                 },
               }}
               containerToPreviousStyle={{
